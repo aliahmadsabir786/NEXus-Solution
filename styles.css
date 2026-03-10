@@ -1,0 +1,1637 @@
+/* ================================================================
+   NEXus Solution — College Management System
+   styles.css  |  All visual styles for the application
+   ================================================================
+
+   TABLE OF CONTENTS
+   -----------------
+   1.  CSS Custom Properties (Design Tokens)
+   2.  Global Reset & Base
+   3.  Typography
+   4.  Layout — App Shell
+   5.  Sidebar Navigation
+   6.  Top Header Bar
+   7.  Main Content Area
+   8.  Cards & Surfaces
+   9.  Buttons
+  10.  Badges & Status Pills
+  11.  Form Inputs & Labels
+  12.  Tables
+  13.  Modal / Dialog
+  14.  Login Page
+  15.  Dashboard Stat Cards
+  16.  Progress Bar
+  17.  Avatar
+  18.  Attendance Page
+  19.  Fee Management
+  20.  Reports
+  21.  Grades
+  22.  Assignments
+  23.  Notices & Complaints
+  24.  Utility Helpers
+  25.  Animations & Transitions
+  26.  Print Styles
+   ================================================================ */
+
+
+/* ================================================================
+   1. CSS Custom Properties  (Design Tokens)
+      All colours, shadows, and spacing in one place.
+      To re-theme the app change values here only.
+   ================================================================ */
+:root {
+  /* ── Background shades ── */
+  --bg:          #f0fdf8;   /* page background         */
+  --bg2:         #ecfdf5;   /* table header background */
+  --surface:     #ffffff;   /* card / panel surface    */
+
+  /* ── Border colours ── */
+  --border:      #d1fae5;
+  --border2:     #a7f3d0;
+
+  /* ── Text colours ── */
+  --text:        #0d2b23;   /* primary text   */
+  --text2:       #134e38;   /* secondary text */
+  --muted:       #4b7a66;   /* muted / hint   */
+
+  /* ── Brand accent (green) ── */
+  --accent:      #059669;
+  --accent-light:#d1fae5;
+  --accent-dark: #047857;
+
+  /* ── Sidebar ── */
+  --sidebar:     #064e3b;
+  --sidebar-text:#a7f3d0;
+
+  /* ── Semantic colours ── */
+  --green:       #16a34a;
+  --green-light: #dcfce7;
+  --red:         #dc2626;
+  --red-light:   #fee2e2;
+  --yellow:      #d97706;
+  --yellow-light:#fef9c3;
+  --orange:      #ea580c;
+  --orange-light:#fff7ed;
+  --blue:        #2563eb;
+  --blue-light:  #dbeafe;
+  --purple:      #7c3aed;
+  --purple-light:#ede9fe;
+
+  /* ── Shadows ── */
+  --shadow:      0 1px 4px rgba(5,150,105,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:   0 4px 20px rgba(5,150,105,.15);
+  --shadow-lg:   0 8px 32px rgba(5,150,105,.20);
+
+  /* ── Border radii ── */
+  --radius-sm:   8px;
+  --radius:      12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+
+  /* ── Spacing scale ── */
+  --space-xs:    4px;
+  --space-sm:    8px;
+  --space-md:    14px;
+  --space-lg:    22px;
+  --space-xl:    28px;
+
+  /* ── Sidebar widths ── */
+  --sidebar-w:      240px;
+  --sidebar-w-collapsed: 64px;
+
+  /* ── Header height ── */
+  --header-h: 68px;
+}
+
+
+/* ================================================================
+   2. Global Reset & Base
+   ================================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App root — full viewport */
+#app {
+  min-height: 100vh;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+
+/* ================================================================
+   3. Typography
+   ================================================================ */
+
+/* Heading family — used for titles, section labels, KPI numbers */
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+p, span, label, input, select, textarea, button {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-muted   { color: var(--muted);  font-size: 12px; }
+.text-sm      { font-size: 12px; }
+.text-xs      { font-size: 11px; }
+.font-bold    { font-weight: 700; }
+.font-black   { font-weight: 800; }
+
+
+/* ================================================================
+   4. Layout — App Shell
+   ================================================================ */
+
+/* The top-level flex wrapper that holds sidebar + main panel */
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Right-hand content column */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+
+/* ================================================================
+   5. Sidebar Navigation
+   ================================================================ */
+
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 4px 0 20px rgba(6,78,59,.3);
+  transition: width .25s ease;
+}
+
+/* Collapsed state — icon-only */
+.sidebar.collapsed {
+  width: var(--sidebar-w-collapsed);
+}
+
+/* Brand logo area at top of sidebar */
+.sidebar-brand {
+  padding: 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--header-h);
+  flex-shrink: 0;
+}
+
+.sidebar-brand-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.sidebar-brand-text .name {
+  font-weight: 800;
+  font-size: 15px;
+  font-family: 'Space Grotesk', sans-serif;
+  color: #fff;
+}
+
+.sidebar-brand-text .year {
+  font-size: 10px;
+  color: var(--sidebar-text);
+  opacity: .6;
+}
+
+/* Nav list */
+.sidebar-nav {
+  flex: 1;
+  padding: 10px 8px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+/* Individual nav item */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 2px;
+  color: var(--sidebar-text);
+  font-weight: 500;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  border-left: 3px solid transparent;
+  transition: background .15s, color .15s, border-left-color .15s;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,.07);
+}
+
+/* Active nav item */
+.nav-item.active {
+  background: rgba(16,185,129,.2);
+  color: #fff;
+  font-weight: 700;
+  border-left-color: var(--accent);
+}
+
+.nav-item .icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* User profile strip at bottom of sidebar */
+.sidebar-user {
+  padding: 12px 14px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.sidebar-user-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255,255,255,.07);
+  border-radius: 10px;
+}
+
+.sidebar-user-info .name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-info .role {
+  font-size: 10px;
+  color: var(--sidebar-text);
+  opacity: .6;
+  text-transform: capitalize;
+}
+
+/* Collapse toggle button at very bottom */
+.sidebar-toggle {
+  padding: 10px 8px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255,255,255,.06);
+  color: var(--sidebar-text);
+  font-size: 16px;
+  transition: background .15s;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(255,255,255,.12);
+}
+
+
+/* ================================================================
+   6. Top Header Bar
+   ================================================================ */
+
+.app-header {
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  flex-shrink: 0;
+  box-shadow: 0 1px 8px rgba(5,150,105,.06);
+}
+
+.app-header .page-title {
+  font-weight: 800;
+  font-size: 17px;
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text);
+}
+
+.app-header .page-date {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.app-header .header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.app-header .user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: right;
+}
+
+.app-header .user-role {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: capitalize;
+  text-align: right;
+}
+
+
+/* ================================================================
+   7. Main Content Area
+   ================================================================ */
+
+/* Scrollable content region */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+/* Scrollbar styling */
+.main-content::-webkit-scrollbar {
+  width: 6px;
+}
+.main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.main-content::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 99px;
+}
+
+
+/* ================================================================
+   8. Cards & Surfaces
+   ================================================================ */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+/* Hover lift effect on clickable cards */
+.card-hover {
+  transition: transform .15s ease, box-shadow .15s ease;
+  cursor: pointer;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Accent-border variant — top coloured stripe */
+.card-accent-top {
+  border-top: 3px solid var(--accent);
+}
+
+/* Grid layouts for cards */
+.cards-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.cards-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.cards-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.cards-grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+
+/* ================================================================
+   9. Buttons
+   ================================================================ */
+
+/* Base button reset */
+button {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: opacity .15s, transform .1s;
+}
+button:active { transform: scale(.97); }
+
+/* ── Primary (green gradient) ── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  border-radius: 10px;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(5,150,105,.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary.btn-sm  { padding: 6px 14px;  font-size: 12px; }
+.btn-primary.btn-lg  { padding: 13px 28px; font-size: 15px; }
+
+/* ── Outlined (ghost green) ── */
+.btn-outline {
+  background: #fff;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.btn-outline.btn-sm { padding: 5px 13px; font-size: 12px; }
+
+/* ── Danger (red) ── */
+.btn-danger {
+  background: var(--red-light);
+  color: var(--red);
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.btn-danger.btn-sm { padding: 5px 13px; font-size: 12px; }
+
+/* ── Success (green light) ── */
+.btn-success {
+  background: var(--green-light);
+  color: var(--green);
+  border: 1px solid #86efac;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.btn-success.btn-sm { padding: 5px 13px; font-size: 12px; }
+
+/* ── Warning (yellow) ── */
+.btn-warning {
+  background: var(--yellow-light);
+  color: var(--yellow);
+  border: 1px solid #fcd34d;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Purple ── */
+.btn-purple {
+  background: var(--purple-light);
+  color: var(--purple);
+  border: 1px solid #c4b5fd;
+  border-radius: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Full-width submit button inside modals ── */
+.btn-submit {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+
+/* ================================================================
+  10. Badges & Status Pills
+   ================================================================ */
+
+/* Generic badge */
+.badge {
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+/* Coloured variants — background + text colour pairs */
+.badge-paid,    .badge-present, .badge-active,   .badge-graded  { background: var(--green-light);  color: var(--green);  }
+.badge-pending, .badge-late                                      { background: var(--yellow-light); color: var(--yellow); }
+.badge-overdue, .badge-absent,  .badge-inactive                 { background: var(--red-light);    color: var(--red);    }
+.badge-partial                                                   { background: var(--orange-light); color: var(--orange); }
+.badge-holiday                                                   { background: var(--orange-light); color: var(--orange); }
+.badge-academic, .badge-submitted                                { background: var(--blue-light);   color: var(--blue);   }
+.badge-event                                                     { background: var(--green-light);  color: var(--green);  }
+.badge-fee                                                       { background: var(--yellow-light); color: var(--yellow); }
+
+/* Grade badges */
+.badge-grade-a  { background: #dcfce7; color: var(--green); }
+.badge-grade-b  { background: var(--accent-light); color: var(--accent-dark); }
+.badge-grade-c  { background: var(--blue-light);   color: var(--blue); }
+.badge-grade-d  { background: var(--yellow-light); color: var(--yellow); }
+.badge-grade-f  { background: var(--red-light);    color: var(--red); }
+
+/* Result pills */
+.badge-pass { background: var(--green-light);  color: var(--green); border-radius: 20px; padding: 2px 10px; font-weight: 700; font-size: 11px; }
+.badge-fail { background: var(--red-light);    color: var(--red);   border-radius: 20px; padding: 2px 10px; font-weight: 700; font-size: 11px; }
+
+
+/* ================================================================
+  11. Form Inputs & Labels
+   ================================================================ */
+
+/* Base input / select / textarea styles */
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* Field wrapper — label + input stacked */
+.form-field {
+  margin-bottom: 14px;
+}
+
+/* Label above input */
+.form-label {
+  font-size: 11px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* Search input with icon prefix */
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  pointer-events: none;
+}
+.search-wrapper .search-input {
+  padding-left: 34px;
+}
+
+/* Filter bar strip used in Students, Fees, Grades etc. */
+.filter-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  box-shadow: var(--shadow);
+}
+
+
+/* ================================================================
+  12. Tables
+   ================================================================ */
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+/* Table header row */
+thead tr {
+  border-bottom: 2px solid var(--border);
+  background: var(--bg2);
+}
+
+th {
+  padding: 11px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+/* Table body rows */
+tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:nth-child(even)  { background: #f9fffe; }
+tbody tr:nth-child(odd)   { background: #fff; }
+
+tbody tr:hover { background: var(--accent-light); }
+
+td {
+  padding: 12px 14px;
+  vertical-align: middle;
+  color: var(--text);
+}
+
+
+/* ================================================================
+  13. Modal / Dialog
+   ================================================================ */
+
+/* Semi-transparent backdrop */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,78,59,.45);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* Modal panel */
+.modal-panel {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  padding: 30px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.25);
+}
+
+.modal-panel.modal-wide {
+  max-width: 580px;
+}
+
+/* Modal header row — title + close button */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.modal-close {
+  background: var(--bg);
+  border: none;
+  color: var(--muted);
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+
+/* ================================================================
+  14. Login Page
+   ================================================================ */
+
+/* Two-column layout: left = branding, right = form */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Left panel — gradient branding side */
+.login-left {
+  flex: 1;
+  background: linear-gradient(160deg, #064e3b 0%, #047857 60%, #059669 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 52px;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle radial highlight on left panel */
+.login-left::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.06) 0%, transparent 60%);
+}
+
+.login-left-content {
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+/* Brand row at top of left panel */
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 52px;
+}
+
+.login-brand-icon {
+  width: 52px;
+  height: 52px;
+  background: rgba(255,255,255,.15);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+}
+
+.login-brand-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.login-brand-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,.55);
+  margin-top: 1px;
+}
+
+/* Big headline */
+.login-headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+
+.login-description {
+  font-size: 15px;
+  color: rgba(255,255,255,.65);
+  line-height: 1.8;
+  margin-bottom: 40px;
+}
+
+/* Feature pills */
+.login-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 44px;
+}
+
+.login-feature-pill {
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Stats row at bottom of left panel */
+.login-stats {
+  display: flex;
+  gap: 28px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+
+.login-stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.login-stat-label {
+  font-size: 11px;
+  color: rgba(255,255,255,.5);
+  margin-top: 3px;
+}
+
+/* Right panel — sign-in form */
+.login-right {
+  width: 490px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 52px;
+  flex-shrink: 0;
+  min-height: 100vh;
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* "Sign In" heading */
+.login-form-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+
+.login-form-subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+
+/* Role selector grid (Admin / Teacher / Student) */
+.login-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.login-role-btn {
+  padding: 14px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;
+  border: 2px solid var(--border);
+  background: #fff;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: all .2s;
+}
+
+.login-role-btn.active,
+.login-role-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
+.login-role-btn .role-icon {
+  font-size: 22px;
+}
+
+/* Hint / hint box below role selector */
+.login-hint {
+  background: var(--accent-light);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 12px;
+  color: var(--accent-dark);
+  margin-bottom: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Error message box */
+.login-error {
+  background: var(--red-light);
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--red);
+  margin-bottom: 16px;
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Sign-in button */
+.login-submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(5,150,105,.4);
+  transition: opacity .2s;
+}
+
+.login-submit-btn:hover { opacity: .92; }
+
+.login-footer {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+
+/* ================================================================
+  15. Dashboard Stat Cards
+   ================================================================ */
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform .15s, box-shadow .15s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Floating icon top-right */
+.stat-card .stat-icon {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  opacity: .9;
+}
+
+.stat-card .stat-value {
+  font-size: 30px;
+  font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.1;
+}
+
+.stat-card .stat-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.stat-card .stat-sub {
+  font-size: 11px;
+  margin-top: 3px;
+  font-weight: 600;
+  opacity: .8;
+}
+
+
+/* ================================================================
+  16. Progress Bar
+   ================================================================ */
+
+.progress-bar-track {
+  background: var(--bg);
+  border-radius: 99px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+
+/* Larger variant for pass-rate display */
+.progress-bar-track.lg { height: 10px; }
+
+
+/* ================================================================
+  17. Avatar
+   ================================================================ */
+
+.avatar {
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(5,150,105,.25);
+  border: 2px solid var(--border2);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Avatar size helpers */
+.avatar-sm  { width: 28px; height: 28px; font-size: 11px; }
+.avatar-md  { width: 36px; height: 36px; font-size: 14px; }
+.avatar-lg  { width: 48px; height: 48px; font-size: 18px; }
+.avatar-xl  { width: 64px; height: 64px; font-size: 24px; }
+
+
+/* ================================================================
+  18. Attendance Page
+   ================================================================ */
+
+/* Date picker + filter strip */
+.attendance-filters {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  box-shadow: var(--shadow);
+}
+
+/* Individual student attendance row */
+.attendance-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-left-width: 4px;
+  border-left-style: solid;
+  margin-bottom: 10px;
+}
+
+/* Present / Absent / Late toggle button within attendance row */
+.att-btn {
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: capitalize;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background .15s, color .15s;
+}
+
+.att-btn.present  { background: var(--green-light);  color: var(--green);  border-color: var(--green);  }
+.att-btn.absent   { background: var(--red-light);    color: var(--red);    border-color: var(--red);    }
+.att-btn.late     { background: var(--yellow-light); color: var(--yellow); border-color: var(--yellow); }
+.att-btn.inactive { background: #fff; color: var(--muted); border-color: var(--border); }
+
+
+/* ================================================================
+  19. Fee Management
+   ================================================================ */
+
+/* Five-column summary stats strip */
+.fee-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* Single fee stat tile */
+.fee-stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border-top-width: 3px;
+  border-top-style: solid;
+  transition: border-color .15s;
+}
+
+.fee-stat-tile .tile-label {
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.fee-stat-tile .tile-value {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Student fee plan card */
+.fee-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  border-left-width: 4px;
+  border-left-style: solid;
+  margin-bottom: 16px;
+}
+
+/* Single installment row inside fee card */
+.installment-row {
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 7px;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.installment-row .inst-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.installment-row .inst-no {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.installment-row .inst-voucher {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.installment-row .inst-paid-date {
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+
+/* ================================================================
+  20. Reports
+   ================================================================ */
+
+/* Filter control bar for reports */
+.report-controls {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  box-shadow: var(--shadow);
+}
+
+/* The printable report area */
+.report-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+/* Report heading block */
+.report-heading {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--border);
+}
+
+.report-heading .report-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.report-heading .report-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* KPI summary grid inside performance report */
+.report-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.report-kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 14px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border-top-width: 3px;
+  border-top-style: solid;
+}
+
+.report-kpi-icon { font-size: 22px; margin-bottom: 6px; }
+
+.report-kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1;
+}
+
+.report-kpi-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: 5px;
+}
+
+
+/* ================================================================
+  21. Grades
+   ================================================================ */
+
+/* Inline subject chip inside grades table */
+.subject-chip {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 10px;
+  margin: 2px;
+  font-weight: 700;
+  border-width: 1px;
+  border-style: solid;
+}
+
+/* Grade mark input inside teacher grades entry table */
+.grade-input {
+  width: 48px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 4px;
+  font-size: 11px;
+  text-align: center;
+  outline: none;
+  display: block;
+  margin: auto;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.grade-input:focus {
+  border-color: var(--accent);
+}
+
+
+/* ================================================================
+  22. Assignments
+   ================================================================ */
+
+/* Assignment card */
+.assignment-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  border-left-width: 4px;
+  border-left-style: solid;
+  margin-bottom: 20px;
+}
+
+/* Submission entry inside assignment card */
+.submission-row {
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-left-width: 4px;
+  border-left-style: solid;
+}
+
+.submission-row .sub-student {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.submission-row .sub-name {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.submission-row .sub-meta {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+
+/* ================================================================
+  23. Notices & Complaints
+   ================================================================ */
+
+.notice-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 22px;
+  box-shadow: var(--shadow);
+  border-left-width: 4px;
+  border-left-style: solid;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.notice-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.complaint-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--red);
+  margin-bottom: 12px;
+}
+
+
+/* ================================================================
+  24. Utility Helpers
+   ================================================================ */
+
+/* Flexbox helpers */
+.flex          { display: flex; }
+.flex-col      { flex-direction: column; }
+.items-center  { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-sm        { gap: 8px; }
+.gap-md        { gap: 14px; }
+.gap-lg        { gap: 20px; }
+.flex-wrap     { flex-wrap: wrap; }
+.flex-1        { flex: 1; }
+
+/* Spacing */
+.mb-sm   { margin-bottom: 8px; }
+.mb-md   { margin-bottom: 14px; }
+.mb-lg   { margin-bottom: 22px; }
+.mb-xl   { margin-bottom: 28px; }
+.mt-md   { margin-top: 14px; }
+
+/* Text alignment */
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+/* Overflow scroll */
+.overflow-x-auto { overflow-x: auto; }
+
+/* Section title — used at top of each page section */
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.section-title h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Empty state placeholder */
+.empty-state {
+  text-align: center;
+  padding: 56px;
+  color: var(--muted);
+}
+
+.empty-state .empty-icon { font-size: 56px; margin-bottom: 14px; }
+.empty-state .empty-text { font-weight: 700; font-size: 16px; }
+
+/* Access denied / locked screen */
+.access-denied {
+  text-align: center;
+  padding: 60px;
+}
+
+.access-denied .lock-icon { font-size: 56px; margin-bottom: 16px; }
+
+/* Info / hint banner */
+.info-banner {
+  background: var(--accent-light);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 12px;
+  color: var(--accent-dark);
+  margin-bottom: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Warning / danger banner */
+.warn-banner {
+  background: var(--red-light);
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--red);
+  margin-bottom: 16px;
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+
+/* ================================================================
+  25. Animations & Transitions
+   ================================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Apply on dynamic content render */
+.animate-fade-in {
+  animation: fadeIn .2s ease forwards;
+}
+
+/* Smooth collapse for sidebar */
+.sidebar {
+  transition: width .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* All interactive elements */
+button,
+.nav-item,
+.card-hover,
+.fee-stat-tile,
+.login-role-btn {
+  transition: all .15s ease;
+}
+
+
+/* ================================================================
+  26. Print Styles
+   ================================================================ */
+
+@media print {
+  /* Hide everything except the printable report area */
+  .app-header,
+  .sidebar,
+  .filter-bar,
+  .report-controls,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    padding: 0;
+  }
+
+  .report-content {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+
+  table {
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+}
