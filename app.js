@@ -449,7 +449,7 @@ function renderShell(){
       <div data-sidebar-toggle title="Toggle menu" style="width:36px;height:36px;background:linear-gradient(135deg,${T.accent},${T.accentD});border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">🎓</div>
       ${!sidebarCollapsed?`<div><div style="font-weight:800;font-size:15px;font-family:'Space Grotesk',sans-serif;color:#fff">NEXus Solution</div><div style="font-size:10px;color:${T.sidebarText};opacity:.6">2025–26</div></div>`:""}
     </div>
-    <nav style="flex:1;padding:10px 8px;overflow-y:auto">
+    <nav style="flex:1;padding:10px 8px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none">
       ${nav.map(n=>{const a=currentPage===n.key;return `<div onclick="navTo('${n.key}')" title="${n.label}" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;cursor:pointer;margin-bottom:2px;background:${a?"rgba(16,185,129,.2)":"transparent"};color:${a?"#fff":T.sidebarText};font-weight:${a?700:500};font-size:13px;white-space:nowrap;overflow:hidden;justify-content:${sidebarCollapsed?"center":"flex-start"};border-left:${a?`3px solid ${T.accent}`:"3px solid transparent"};transition:all .15s"><span style="font-size:16px;flex-shrink:0">${n.icon}</span>${!sidebarCollapsed?`<span>${n.label}</span>`:""}</div>`;}).join("")}
     </nav>
     ${!sidebarCollapsed?`<div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.08)"><div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.07);border-radius:10px">${ava(currentUser.name,32,getUserPhoto())}<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(currentUser.name)}</div><div style="font-size:10px;color:${T.sidebarText};opacity:.6;text-transform:capitalize">${currentUser.isSubAdmin?"Sub-Admin":currentUser.role}</div></div></div></div>`:""}
@@ -468,7 +468,7 @@ function renderShell(){
         <button onclick="doLogout()" style="background:${T.redL};color:${T.red};border:1px solid #fca5a5;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer">Logout</button>
       </div>
     </div>
-    <div style="flex:1;overflow-y:auto;padding:28px" id="main-content">${renderPage()}</div>
+    <div style="flex:1;overflow-y:auto;padding:28px;scrollbar-width:none;-ms-overflow-style:none" id="main-content">${renderPage()}</div>
   </div>
 </div>
 <div id="sidebar-backdrop" style="display:none;position:fixed;inset:0;background:rgba(6,78,59,.5);backdrop-filter:blur(3px);z-index:998;cursor:pointer"></div>
@@ -1808,7 +1808,7 @@ function renderModal(){
     <button onclick="closeModal()" style="width:100%;background:linear-gradient(135deg,${T.accent},${T.accentD});color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer">Close</button>`;}
 
   return `<div onclick="closeModal()" style="position:fixed;inset:0;background:rgba(6,78,59,.45);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px">
-    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px;padding:30px;width:100%;max-width:${modalState==="addSubAdmin"||modalState==="editSubAdmin"?"580px":"520px"};max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px;padding:30px;width:100%;max-width:${modalState==="addSubAdmin"||modalState==="editSubAdmin"?"580px":"520px"};max-height:90vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-shadow:0 24px 64px rgba(0,0,0,.25)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
         <span style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:18px;color:${T.text}">${title}</span>
         <button onclick="closeModal()" style="background:${T.bg};border:none;color:${T.muted};border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">✕</button>
