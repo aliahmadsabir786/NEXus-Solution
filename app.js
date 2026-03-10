@@ -77,11 +77,11 @@ let students=[
   {id:"S008",name:"Farhan Siddiqui", cls:"CS-A", rollNo:"03",phone:"03014445566",guardianPhone:"03015556677",email:"farhan@cms.edu", feeStatus:"paid",   dob:"2003-12-01",password:"1234",portal:"active",subjectGroup:"Computer Science"},
 ];
 let teachers=[
-  {id:"T001",name:"Dr. Khalid Mehmood", subject:"Data Structures",   dept:"Computer Science",phone:"03001111111",email:"khalid@cms.edu",joinDate:"2015-03-01",qualification:"PhD CS",     password:"teach1",portal:"active"},
-  {id:"T002",name:"Prof. Amina Syed",   subject:"Calculus",          dept:"Mathematics",     phone:"03112222222",email:"amina@cms.edu", joinDate:"2018-08-15",qualification:"MPhil Math", password:"teach2",portal:"active"},
-  {id:"T003",name:"Mr. Tariq Javed",    subject:"English Literature",dept:"English",         phone:"03333333333",email:"tariq@cms.edu", joinDate:"2020-01-10",qualification:"MA English", password:"teach3",portal:"active"},
-  {id:"T004",name:"Ms. Rabia Nawaz",    subject:"Microeconomics",    dept:"Business Admin",  phone:"03214444444",email:"rabia@cms.edu", joinDate:"2019-06-20",qualification:"MBA",        password:"teach4",portal:"active"},
-  {id:"T005",name:"Dr. Imran Sheikh",   subject:"Physics",           dept:"Sciences",        phone:"03455555555",email:"imran@cms.edu", joinDate:"2012-09-01",qualification:"PhD Physics",password:"teach5",portal:"active"},
+  {id:"T001",name:"Dr. Khalid Mehmood", subject:"Data Structures",   dept:"Computer Science",phone:"03001111111",email:"khalid@cms.edu",joinDate:"2015-03-01",qualification:"PhD CS",     password:"teach1",portal:"active",assignedClasses:["CS-A","CS-B"]},
+  {id:"T002",name:"Prof. Amina Syed",   subject:"Calculus",          dept:"Mathematics",     phone:"03112222222",email:"amina@cms.edu", joinDate:"2018-08-15",qualification:"MPhil Math", password:"teach2",portal:"active",assignedClasses:["CS-A","CS-B"]},
+  {id:"T003",name:"Mr. Tariq Javed",    subject:"English Literature",dept:"English",         phone:"03333333333",email:"tariq@cms.edu", joinDate:"2020-01-10",qualification:"MA English", password:"teach3",portal:"active",assignedClasses:["BBA-A","BBA-B"]},
+  {id:"T004",name:"Ms. Rabia Nawaz",    subject:"Microeconomics",    dept:"Business Admin",  phone:"03214444444",email:"rabia@cms.edu", joinDate:"2019-06-20",qualification:"MBA",        password:"teach4",portal:"active",assignedClasses:["BBA-A","BBA-B"]},
+  {id:"T005",name:"Dr. Imran Sheikh",   subject:"Physics",           dept:"Sciences",        phone:"03455555555",email:"imran@cms.edu", joinDate:"2012-09-01",qualification:"PhD Physics",password:"teach5",portal:"active",assignedClasses:["CS-A","CS-B","BBA-A","BBA-B"]},
 ];
 const CLASSES=["CS-A","CS-B","BBA-A","BBA-B"];
 const SUBJECTS=["English","Urdu","Islamiyat","Biology","Physics","Chemistry","Mathematics","Computer Science","Data Structures","Calculus","Statistics","OOP"];
@@ -116,7 +116,7 @@ const SUB_ADMIN_PERMS=[
 
 const weekDays=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toISOString().split("T")[0];}).filter(d=>![0,6].includes(new Date(d).getDay()));
 
-let attendance=(()=>{const r={};students.forEach(s=>{r[s.id]={};weekDays.forEach(d=>{r[s.id][d]=Math.random()>.15?"present":Math.random()>.5?"absent":"late";});});return r;})();
+let attendance=(()=>{const r={};students.forEach(s=>{r[s.id]={};weekDays.forEach(d=>{r[s.id][d]=Math.random()>.15?"present":Math.random()>.5?"absent":"leave";});});return r;})();
 let grades=(()=>{const g={};students.forEach(s=>{g[s.id]={};const subs=SUBJECT_GROUPS[s.subjectGroup||"Computer Science"]||[];subs.forEach(sub=>{const mid=Math.floor(Math.random()*22)+18,fin=Math.floor(Math.random()*40)+38,intern=Math.floor(Math.random()*12)+10;g[s.id][sub]={midterm:mid,final:fin,internal:intern,total:mid+fin+intern};});});return g;})();
 
 let feeVouchers={
@@ -198,9 +198,10 @@ const gradeColor=t=>t>=80?T.green:t>=65?T.accent:t>=45?T.yellow:T.red;
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 
 function badge(status,size="sm"){
-  const map={paid:[T.green,T.greenL],partial:[T.orange,T.orangeL],pending:[T.yellow,T.yellowL],overdue:[T.red,T.redL],present:[T.green,T.greenL],absent:[T.red,T.redL],late:[T.yellow,T.yellowL],active:[T.accent,T.accentL],inactive:[T.red,T.redL],holiday:[T.orange,T.orangeL],academic:[T.blue,T.blueL],event:[T.green,T.greenL],fee:[T.yellow,T.yellowL],submitted:[T.blue,T.blueL],graded:[T.green,T.greenL],pending_review:[T.yellow,T.yellowL]};
+  const map={paid:[T.green,T.greenL],partial:[T.orange,T.orangeL],pending:[T.yellow,T.yellowL],overdue:[T.red,T.redL],present:[T.green,T.greenL],absent:[T.red,T.redL],late:[T.yellow,T.yellowL],leave:[T.yellow,T.yellowL],active:[T.accent,T.accentL],inactive:[T.red,T.redL],holiday:[T.orange,T.orangeL],academic:[T.blue,T.blueL],event:[T.green,T.greenL],fee:[T.yellow,T.yellowL],submitted:[T.blue,T.blueL],graded:[T.green,T.greenL],pending_review:[T.yellow,T.yellowL]};
   const[fg,bg]=map[status]||[T.muted,"#f1f5f9"];
-  return `<span style="background:${bg};color:${fg};border-radius:20px;padding:${size==="sm"?"2px 10px":"3px 14px"};font-size:${size==="sm"?11:12}px;font-weight:700;text-transform:capitalize;white-space:nowrap">${esc(status.replace(/_/g," "))}</span>`;
+  const displayLabel=status==="leave"?"🏖️ Leave":status.replace(/_/g," ");
+  return `<span style="background:${bg};color:${fg};border-radius:20px;padding:${size==="sm"?"2px 10px":"3px 14px"};font-size:${size==="sm"?11:12}px;font-weight:700;text-transform:capitalize;white-space:nowrap">${esc(displayLabel)}</span>`;
 }
 function pbtn(label,oc,sz="md"){const p=sz==="sm"?"6px 14px":sz==="lg"?"13px 28px":"9px 20px";const fs=sz==="sm"?12:sz==="lg"?15:13;return `<button onclick="${oc}" style="background:linear-gradient(135deg,${T.accent},${T.accentD});color:#fff;border:none;border-radius:10px;padding:${p};font-size:${fs}px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(5,150,105,.3)">${label}</button>`;}
 function obtn(label,oc,sz="md"){const p=sz==="sm"?"5px 13px":"8px 18px";const fs=sz==="sm"?12:13;return `<button onclick="${oc}" style="background:#fff;color:${T.accent};border:1.5px solid ${T.accent};border-radius:10px;padding:${p};font-size:${fs}px;font-weight:700;cursor:pointer">${label}</button>`;}
@@ -306,7 +307,7 @@ function handleFeeSearch(val){feeFilter.search=val;clearTimeout(_searchTimer);_s
 //     does NOT destroy and recreate the whole page — the focused
 //     input element is saved and restored after the update.
 // ================================================================
-function render(){_chartQueue=[];document.getElementById("app").innerHTML=currentUser?renderShell():renderLogin();flushCharts();}
+function render(){_chartQueue=[];document.getElementById("app").innerHTML=currentUser?renderShell():renderLogin();flushCharts();if(currentUser)_initSidebarToggle();}
 function refreshContent(){
   _chartQueue=[];
   // Save focused search input info before re-render
@@ -341,8 +342,8 @@ function refreshContent(){
 // ================================================================
 function renderLogin(){
   const hints={admin:{h:"admin / admin123 (or sub-admin credentials)",i:"🛡️",l:"Admin"},teacher:{h:"T001–T005 / teach1–teach5",i:"👨‍🏫",l:"Teacher"},student:{h:"S001–S008 / 1234",i:"🎓",l:"Student"}};
-  return `<div style="min-height:100vh;display:flex;align-items:stretch;font-family:'Plus Jakarta Sans',sans-serif">
-  <div style="flex:1;background:linear-gradient(160deg,#064e3b 0%,#047857 60%,#059669 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px;min-height:100vh;position:relative;overflow:hidden">
+  return `<div id="nexus-login-wrap" style="min-height:100vh;display:flex;align-items:stretch;font-family:'Plus Jakarta Sans',sans-serif">
+  <div id="nexus-login-left" style="flex:1;background:linear-gradient(160deg,#064e3b 0%,#047857 60%,#059669 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px;min-height:100vh;position:relative;overflow:hidden">
     <div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.06) 0%,transparent 60%)"></div>
     <div style="max-width:420px;width:100%;position:relative;z-index:1">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:52px">
@@ -359,7 +360,7 @@ function renderLogin(){
       </div>
     </div>
   </div>
-  <div style="width:490px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px;flex-shrink:0;min-height:100vh">
+  <div id="nexus-login-right" style="width:490px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px;flex-shrink:0;min-height:100vh">
     <div style="width:100%;max-width:380px">
       <div style="margin-bottom:32px"><div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:${T.text}">Sign In</div><div style="font-size:13px;color:${T.muted};margin-top:5px">Select your role and enter your credentials</div></div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px">
@@ -442,10 +443,10 @@ function canAccess(page){
 // ================================================================
 function renderShell(){
   const nav=getNav(),sw=sidebarCollapsed?64:240,lbl=nav.find(n=>n.key===currentPage)?.label||"";
-  return `<div style="display:flex;height:100vh;overflow:hidden">
-  <div style="width:${sw}px;background:${T.sidebar};display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;box-shadow:4px 0 20px rgba(6,78,59,.3);transition:width .25s">
+  return `<div id="nexus-shell" style="display:flex;height:100vh;overflow:hidden">
+  <div id="app-sidebar" style="width:${sw}px;background:${T.sidebar};display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;box-shadow:4px 0 20px rgba(6,78,59,.3);transition:width .25s">
     <div style="padding:18px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;justify-content:${sidebarCollapsed?"center":"flex-start"};height:68px;flex-shrink:0">
-      <div style="width:36px;height:36px;background:linear-gradient(135deg,${T.accent},${T.accentD});border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px">🎓</div>
+      <div data-sidebar-toggle title="Toggle menu" style="width:36px;height:36px;background:linear-gradient(135deg,${T.accent},${T.accentD});border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">🎓</div>
       ${!sidebarCollapsed?`<div><div style="font-weight:800;font-size:15px;font-family:'Space Grotesk',sans-serif;color:#fff">NEXus Solution</div><div style="font-size:10px;color:${T.sidebarText};opacity:.6">2025–26</div></div>`:""}
     </div>
     <nav style="flex:1;padding:10px 8px;overflow-y:auto">
@@ -455,20 +456,50 @@ function renderShell(){
     <div style="padding:10px 8px;border-top:1px solid rgba(255,255,255,.08)"><div onclick="toggleSidebar()" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:10px;cursor:pointer;background:rgba(255,255,255,.06);color:${T.sidebarText};font-size:16px">${sidebarCollapsed?"→":"←"}</div></div>
   </div>
   <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:${T.bg}">
-    <div style="background:#fff;border-bottom:1px solid ${T.border};padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:68px;flex-shrink:0;box-shadow:0 1px 8px rgba(5,150,105,.06)">
-      <div><div style="font-weight:800;font-size:17px;font-family:'Space Grotesk',sans-serif;color:${T.text}">${lbl}</div><div style="font-size:11px;color:${T.muted};margin-top:1px">${new Date().toLocaleDateString("en-PK",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</div></div>
+    <div id="app-header" style="background:#fff;border-bottom:1px solid ${T.border};padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:68px;flex-shrink:0;box-shadow:0 1px 8px rgba(5,150,105,.06)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button id="mobile-hamburger" data-sidebar-toggle onclick="event.stopPropagation()" style="display:none;align-items:center;justify-content:center;width:38px;height:38px;background:${T.accentL};border:1.5px solid ${T.border2};border-radius:10px;cursor:pointer;font-size:18px;color:${T.accentD};flex-shrink:0">☰</button>
+        <div><div style="font-weight:800;font-size:17px;font-family:'Space Grotesk',sans-serif;color:${T.text}">${lbl}</div><div id="header-date" style="font-size:11px;color:${T.muted};margin-top:1px">${new Date().toLocaleDateString("en-PK",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</div></div>
+      </div>
       <div style="display:flex;gap:12px;align-items:center">
-        <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:${T.text}">${esc(currentUser.name)}</div><div style="font-size:10px;color:${T.muted};text-transform:capitalize">${currentUser.isSubAdmin?"Sub-Admin":currentUser.role}</div></div>
+        <div id="header-username" style="text-align:right"><div style="font-size:13px;font-weight:700;color:${T.text}">${esc(currentUser.name)}</div><div style="font-size:10px;color:${T.muted};text-transform:capitalize">${currentUser.isSubAdmin?"Sub-Admin":currentUser.role}</div></div>
         ${ava(currentUser.name,38,getUserPhoto())}
-        <button onclick="openModal('changePassword')" style="background:${T.accentL};color:${T.accentD};border:1.5px solid ${T.border2};border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer">🔑 Password</button>
+        <button id="header-pwd-btn" onclick="openModal('changePassword')" style="background:${T.accentL};color:${T.accentD};border:1.5px solid ${T.border2};border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer">🔑 Password</button>
         <button onclick="doLogout()" style="background:${T.redL};color:${T.red};border:1px solid #fca5a5;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer">Logout</button>
       </div>
     </div>
     <div style="flex:1;overflow-y:auto;padding:28px" id="main-content">${renderPage()}</div>
   </div>
 </div>
+<div id="sidebar-backdrop" style="display:none;position:fixed;inset:0;background:rgba(6,78,59,.5);backdrop-filter:blur(3px);z-index:998;cursor:pointer"></div>
 ${renderModal()}`;}
 
+function _initSidebarToggle(){
+  // All elements with data-sidebar-toggle open/close the mobile drawer
+  document.querySelectorAll('[data-sidebar-toggle]').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      document.body.classList.toggle('sidebar-open');
+    });
+  });
+  // Backdrop tap closes sidebar
+  var bd=document.getElementById('sidebar-backdrop');
+  if(bd){bd.addEventListener('click',function(){document.body.classList.remove('sidebar-open');});}
+  // Any nav-item tap on mobile closes sidebar
+  document.querySelectorAll('.nav-item').forEach(function(item){
+    item.addEventListener('click',function(){
+      if(window.innerWidth<=768)document.body.classList.remove('sidebar-open');
+    });
+  });
+  // Show/hide hamburger via CSS already; also make sure it's display:flex not block
+  var hb=document.getElementById('mobile-hamburger');
+  if(hb){
+    // Handled by CSS media query, but ensure visibility syncs on resize
+    function syncHamburger(){hb.style.display=window.innerWidth<=768?'flex':'none';}
+    syncHamburger();
+    window.addEventListener('resize',syncHamburger);
+  }
+}
 function getNav(){
   if(currentUser.role==="admin"){
     if(currentUser.isSubAdmin){
@@ -476,7 +507,7 @@ function getNav(){
       const allNav=[{key:"dashboard",icon:"📊",label:"Dashboard"},...SUB_ADMIN_PERMS.filter(p=>perms.includes(p.key)).map(p=>({key:p.key,icon:p.label.split(" ")[0],label:p.label.replace(/^[^ ]+ /,"")}))]
       return allNav;
     }
-    return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"students",icon:"🎓",label:"Students"},{key:"teachers",icon:"👨‍🏫",label:"Teachers"},{key:"attendance",icon:"📋",label:"Attendance"},{key:"exams",icon:"📝",label:"Exams"},{key:"grades",icon:"📈",label:"Grades"},{key:"fees",icon:"💳",label:"Fees"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"notices",icon:"📢",label:"Notices"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"reports",icon:"📋",label:"Reports"},{key:"portals",icon:"🔐",label:"Portal Access"},{key:"subadmins",icon:"👥",label:"Sub-Admins"},{key:"settings",icon:"⚙️",label:"Settings"}];
+    return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"students",icon:"🎓",label:"Students"},{key:"teachers",icon:"👨‍🏫",label:"Teachers"},{key:"exams",icon:"📝",label:"Exams"},{key:"grades",icon:"📈",label:"Grades"},{key:"fees",icon:"💳",label:"Fees"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"notices",icon:"📢",label:"Notices"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"reports",icon:"📋",label:"Reports"},{key:"portals",icon:"🔐",label:"Portal Access"},{key:"subadmins",icon:"👥",label:"Sub-Admins"},{key:"settings",icon:"⚙️",label:"Settings"}];
   }
   if(currentUser.role==="teacher")return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"attendance",icon:"📋",label:"Mark Attendance"},{key:"grades",icon:"📈",label:"Enter Grades"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"timetable",icon:"🕐",label:"My Timetable"},{key:"notices",icon:"📢",label:"Notices"}];
   return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"attendance",icon:"📋",label:"My Attendance"},{key:"grades",icon:"📈",label:"My Grades"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"fees",icon:"💳",label:"Fee Vouchers"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"exams",icon:"📝",label:"Exams"},{key:"notices",icon:"📢",label:"Notices"}];
@@ -510,7 +541,7 @@ function renderAdminPage(){
     case "dashboard":   return renderAdminDash();
     case "students":    return canAccess("students")?renderAdminStudents():renderNoAccess();
     case "teachers":    return canAccess("teachers")?renderAdminTeachers():renderNoAccess();
-    case "attendance":  return canAccess("attendance")?renderAttPage(true):renderNoAccess();
+    case "attendance":  return canAccess("attendance")?renderAdminAttReport():renderNoAccess();
     case "exams":       return canAccess("exams")?renderAdminExams():renderNoAccess();
     case "grades":      return canAccess("grades")?renderGrades(false):renderNoAccess();
     case "fees":        return canAccess("fees")?renderAdminFees():renderNoAccess();
@@ -676,27 +707,31 @@ function renderAdminTeachers(){
     ${filtT.map(t=>`<div class="card-hover" style="background:${T.surface};border:1px solid ${T.border};border-radius:16px;padding:22px;box-shadow:${T.shadow}">
       <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px">${ava(t.name,46,t.photo||null)}<div style="flex:1"><div style="font-weight:700;font-size:14px">${esc(t.name)}</div><div style="font-size:12px;color:${T.accent};font-weight:600;margin-top:2px">${t.subject}</div><div style="font-size:11px;color:${T.muted}">${t.dept}</div></div>${badge(t.portal)}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;background:${T.bg};border-radius:10px;padding:12px">${[["ID",t.id],["Qual.",t.qualification],["Phone",t.phone],["Joined",t.joinDate]].map(([k,v])=>`<div><div style="font-size:10px;color:${T.muted};font-weight:700;text-transform:uppercase">${k}</div><div style="font-size:12px;margin-top:2px;font-weight:600">${esc(v)}</div></div>`).join("")}</div>
+      <div style="background:${T.accentL};border:1px solid ${T.border2};border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:${T.accentD};font-weight:600">🏫 Assigned Classes: <strong>${(t.assignedClasses&&t.assignedClasses.length>0?t.assignedClasses:["All"]).join(" · ")}</strong></div>
       <div style="display:flex;gap:8px">${obtn("Edit",`openEditTeacher('${t.id}')`, "sm")}${dbtn("Remove",`delTeacher('${t.id}')`, "sm")}${timetables[t.id]?`<button onclick="window.open(timetables['${t.id}'].data)" style="background:${T.accentL};color:${T.accent};border:1px solid ${T.border2};border-radius:10px;padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer">View TT</button>`:""}</div>
     </div>`).join("")}
   </div>`;}
 
-function renderAttPage(isAdmin){
+// ─── Admin-only: read-only attendance report (admin cannot mark attendance) ───
+function renderAdminAttReport(){
   const cs=students.filter(s=>s.cls===attFilter.cls);
-  return `${isAdmin?"":secTitle("Mark Attendance")}
+  return `${secTitle("📋 Attendance Report (View Only)")}
+  <div style="background:${T.yellowL};border:1px solid #fcd34d;border-radius:10px;padding:11px 16px;margin-bottom:18px;font-size:12px;color:${T.yellow};font-weight:700;display:flex;gap:10px;align-items:center">
+    <span>ℹ️</span> Attendance is marked by teachers. This is a read-only view for the admin.
+  </div>
   <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end">
     <div><label style="font-size:11px;color:${T.muted};display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase">Class</label><select onchange="attFilter.cls=this.value;refreshContent()" style="background:#fff;border:1.5px solid ${T.border};border-radius:10px;padding:9px 14px;color:${T.text};font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif">${CLASSES.map(c=>`<option value="${c}" ${c===attFilter.cls?"selected":""}>${c}</option>`).join("")}</select></div>
     <div><label style="font-size:11px;color:${T.muted};display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase">Date</label><input type="date" value="${attFilter.date}" onchange="attFilter.date=this.value;refreshContent()" style="background:#fff;border:1.5px solid ${T.border};border-radius:10px;padding:9px 14px;color:${T.text};font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif"/></div>
-    ${sbtn("✅ All Present","bulkAtt('present')")}${dbtn("❌ All Absent","bulkAtt('absent')")}
   </div>
   <div style="display:grid;gap:10px">${cs.map(s=>{
     const st=attendance[s.id]?.[attFilter.date]||"absent";
-    const sc={present:T.green,absent:T.red,late:T.yellow}[st];
+    const sc={present:T.green,absent:T.red,leave:T.yellow}[st]||T.muted;
     return `<div style="background:${T.surface};border:1px solid ${T.border};border-radius:14px;padding:14px 18px;box-shadow:${T.shadow};display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-left:4px solid ${sc}">
       <div style="display:flex;align-items:center;gap:12px">${ava(s.name,38)}<div><div style="font-weight:700;font-size:14px">${esc(s.name)}</div><div style="font-size:11px;color:${T.muted}">Roll# ${s.rollNo} · ${s.cls}</div></div></div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(st)}${["present","absent","late"].map(opt=>`<button onclick="markAtt('${s.id}','${opt}')" style="background:${st===opt?(opt==="present"?T.greenL:opt==="absent"?T.redL:T.yellowL):"#fff"};color:${st===opt?(opt==="present"?T.green:opt==="absent"?T.red:T.yellow):T.muted};border:1.5px solid ${st===opt?(opt==="present"?T.green:opt==="absent"?T.red:T.yellow):T.border};border-radius:8px;padding:5px 12px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize">${opt}</button>`).join("")}${!isAdmin?dbtn("⚠️",`openComplaint('${s.id}')`, "sm"):""}</div>
+      <div style="display:flex;gap:8px;align-items:center">${badge(st)}</div>
     </div>`;}).join("")}
-  </div>`;}
-
+  </div>`;
+}
 function renderAdminExams(){
   return `<div style="display:flex;justify-content:flex-end;margin-bottom:18px">${pbtn("+ Schedule Exam","openModal('addExam')")}</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
@@ -938,7 +973,7 @@ function generateReport(){
     const dates=weekDays;const totalDays=dates.length;
     return `<div style="text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid ${T.border}"><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;color:${T.text}">Monthly Attendance Report</div><div style="font-size:13px;color:${T.muted};margin-top:4px">Class: ${cls==="ALL"?"All Classes":cls} · Month: ${reportFilter.month} · Total Working Days: ${totalDays}</div><div style="font-size:11px;color:${T.muted};margin-top:2px">NEXus Solution · Generated: ${new Date().toLocaleDateString()}</div></div>
     <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:${T.bg2}"><th style="padding:10px 12px;text-align:left;font-weight:700;border:1px solid ${T.border}">Roll#</th><th style="padding:10px 12px;text-align:left;font-weight:700;border:1px solid ${T.border}">Student Name</th><th style="padding:10px 12px;text-align:left;font-weight:700;border:1px solid ${T.border}">Class</th>${dates.map(d=>`<th style="padding:10px 6px;text-align:center;font-weight:700;border:1px solid ${T.border};white-space:nowrap;font-size:10px">${d.slice(5)}</th>`).join("")}<th style="padding:10px 8px;text-align:center;font-weight:700;border:1px solid ${T.border}">Present</th><th style="padding:10px 8px;text-align:center;font-weight:700;border:1px solid ${T.border}">Absent</th><th style="padding:10px 8px;text-align:center;font-weight:700;border:1px solid ${T.border}">%</th><th style="padding:10px 8px;text-align:center;font-weight:700;border:1px solid ${T.border}">Status</th></tr></thead>
-    <tbody>${rStudents.map((s,i)=>{const myAtt=attendance[s.id]||{};const pres=dates.filter(d=>myAtt[d]==="present").length;const abs=dates.filter(d=>myAtt[d]==="absent").length;const pct=totalDays?Math.round(pres/totalDays*100):0;const col=pct>=75?T.green:T.red;return `<tr style="background:${i%2?"#f9fffe":"#fff"}"><td style="padding:8px 12px;border:1px solid ${T.border};font-weight:600">${s.rollNo}</td><td style="padding:8px 12px;border:1px solid ${T.border};font-weight:600">${esc(s.name)}</td><td style="padding:8px 12px;border:1px solid ${T.border}">${s.cls}</td>${dates.map(d=>{const st=myAtt[d]||"absent";const ic=st==="present"?"✓":st==="late"?"L":"✗";const c=st==="present"?T.green:st==="late"?T.yellow:T.red;return `<td style="padding:6px;text-align:center;border:1px solid ${T.border};color:${c};font-weight:700;font-size:11px">${ic}</td>`;}).join("")}<td style="padding:8px;text-align:center;border:1px solid ${T.border};color:${T.green};font-weight:700">${pres}</td><td style="padding:8px;text-align:center;border:1px solid ${T.border};color:${T.red};font-weight:700">${abs}</td><td style="padding:8px;text-align:center;border:1px solid ${T.border};color:${col};font-weight:800">${pct}%</td><td style="padding:8px;text-align:center;border:1px solid ${T.border}"><span style="background:${col}20;color:${col};border-radius:20px;padding:2px 8px;font-weight:700;font-size:10px">${pct>=75?"Regular":"Short"}</span></td></tr>`;}).join("")}</tbody></table></div>`;
+    <tbody>${rStudents.map((s,i)=>{const myAtt=attendance[s.id]||{};const pres=dates.filter(d=>myAtt[d]==="present").length;const abs=dates.filter(d=>myAtt[d]==="absent").length;const pct=totalDays?Math.round(pres/totalDays*100):0;const col=pct>=75?T.green:T.red;return `<tr style="background:${i%2?"#f9fffe":"#fff"}"><td style="padding:8px 12px;border:1px solid ${T.border};font-weight:600">${s.rollNo}</td><td style="padding:8px 12px;border:1px solid ${T.border};font-weight:600">${esc(s.name)}</td><td style="padding:8px 12px;border:1px solid ${T.border}">${s.cls}</td>${dates.map(d=>{const st=myAtt[d]||"absent";const ic=st==="present"?"✓":st==="leave"?"L":"✗";const c=st==="present"?T.green:st==="leave"?T.yellow:T.red;return `<td style="padding:6px;text-align:center;border:1px solid ${T.border};color:${c};font-weight:700;font-size:11px">${ic}</td>`;}).join("")}<td style="padding:8px;text-align:center;border:1px solid ${T.border};color:${T.green};font-weight:700">${pres}</td><td style="padding:8px;text-align:center;border:1px solid ${T.border};color:${T.red};font-weight:700">${abs}</td><td style="padding:8px;text-align:center;border:1px solid ${T.border};color:${col};font-weight:800">${pct}%</td><td style="padding:8px;text-align:center;border:1px solid ${T.border}"><span style="background:${col}20;color:${col};border-radius:20px;padding:2px 8px;font-weight:700;font-size:10px">${pct>=75?"Regular":"Short"}</span></td></tr>`;}).join("")}</tbody></table></div>`;
   }
   if(reportFilter.type==="grades"){
     return `<div style="text-align:center;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid ${T.border}"><div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800">Grade Sheet</div><div style="font-size:13px;color:${T.muted};margin-top:4px">Class: ${cls==="ALL"?"All Classes":cls} · Academic Year: 2025–26</div></div>
@@ -1199,36 +1234,67 @@ function renderTeacherPage(){
   }
 }
 
-// ─── Teacher: attendance scoped to teacher's own subject ───────────
+// ─── Teacher: attendance scoped to teacher's assigned classes & subject ───────
 function renderTeacherSubjectAttendance(t){
   if(!t)return`<div style="padding:40px;text-align:center;color:${T.red}">Teacher not found</div>`;
   const subj=t.subject;
-  // Students whose subject-group includes this teacher's subject
-  const myStudents=students.filter(s=>(SUBJECT_GROUPS[s.subjectGroup||"Computer Science"]||[]).includes(subj));
+  // Assigned classes set by admin (fallback: all classes if none assigned)
+  const assignedCls=t.assignedClasses&&t.assignedClasses.length>0?t.assignedClasses:CLASSES;
+  // Selected class: use attFilter.teacherCls, default to first assigned class
+  if(!attFilter.teacherCls||!assignedCls.includes(attFilter.teacherCls))attFilter.teacherCls=assignedCls[0];
+  const selCls=attFilter.teacherCls;
+  // Students of selected class whose subject-group includes this teacher's subject
+  const myStudents=students.filter(s=>s.cls===selCls&&(SUBJECT_GROUPS[s.subjectGroup||"Computer Science"]||[]).includes(subj));
   const ids=myStudents.map(s=>s.id);
+  // Stats for selected date
+  const presentCount=ids.filter(sid=>(attendance[sid]?.[attFilter.date]||"absent")==="present").length;
+  const absentCount=ids.filter(sid=>(attendance[sid]?.[attFilter.date]||"absent")==="absent").length;
+  const leaveCount=ids.filter(sid=>(attendance[sid]?.[attFilter.date]||"absent")==="leave").length;
   return `
-  ${secTitle("📋 Attendance — "+subj)}
-  <div style="background:${T.accentL};border:1px solid ${T.border2};border-radius:10px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:${T.accentD};font-weight:600">
-    📚 You are marking attendance for <strong>${subj}</strong> · ${myStudents.length} enrolled student(s)
+  ${secTitle("📋 Mark Attendance — "+subj)}
+  <div style="background:${T.accentL};border:1px solid ${T.border2};border-radius:10px;padding:11px 16px;margin-bottom:16px;font-size:12px;color:${T.accentD};font-weight:600;display:flex;gap:10px;align-items:center">
+    <span>📚</span> You are marking attendance for <strong>${subj}</strong> — only your assigned classes are shown.
   </div>
-  <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end">
-    <div><label style="font-size:11px;color:${T.muted};display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase">Date</label>
-      <input type="date" value="${attFilter.date}" onchange="attFilter.date=this.value;refreshContent()" style="background:#fff;border:1.5px solid ${T.border};border-radius:10px;padding:9px 14px;color:${T.text};font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif"/></div>
+  <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end">
+    <div>
+      <label style="font-size:11px;color:${T.muted};display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase">Assigned Class</label>
+      <select onchange="attFilter.teacherCls=this.value;refreshContent()" style="background:#fff;border:1.5px solid ${T.border};border-radius:10px;padding:9px 14px;color:${T.text};font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif">
+        ${assignedCls.map(c=>`<option value="${c}" ${c===selCls?"selected":""}>${c}</option>`).join("")}
+      </select>
+    </div>
+    <div>
+      <label style="font-size:11px;color:${T.muted};display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase">Date</label>
+      <input type="date" value="${attFilter.date}" onchange="attFilter.date=this.value;refreshContent()" style="background:#fff;border:1.5px solid ${T.border};border-radius:10px;padding:9px 14px;color:${T.text};font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif"/>
+    </div>
     ${sbtn("✅ All Present","bulkSubjectAtt('present',"+JSON.stringify(ids)+")")}
     ${dbtn("❌ All Absent","bulkSubjectAtt('absent',"+JSON.stringify(ids)+")")}
   </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
+    <div style="background:${T.greenL};border:1px solid #86efac;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:${T.green};font-family:'Space Grotesk',sans-serif">${presentCount}</div>
+      <div style="font-size:11px;font-weight:700;color:${T.green};margin-top:3px">✅ Present</div>
+    </div>
+    <div style="background:${T.redL};border:1px solid #fca5a5;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:${T.red};font-family:'Space Grotesk',sans-serif">${absentCount}</div>
+      <div style="font-size:11px;font-weight:700;color:${T.red};margin-top:3px">❌ Absent</div>
+    </div>
+    <div style="background:${T.yellowL};border:1px solid #fcd34d;border-radius:12px;padding:14px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:${T.yellow};font-family:'Space Grotesk',sans-serif">${leaveCount}</div>
+      <div style="font-size:11px;font-weight:700;color:${T.yellow};margin-top:3px">🏖️ On Leave</div>
+    </div>
+  </div>
   ${myStudents.length===0
-    ?`<div style="text-align:center;padding:48px;color:${T.muted};background:${T.surface};border:1px solid ${T.border};border-radius:14px">No students are enrolled in <strong>${subj}</strong></div>`
+    ?`<div style="text-align:center;padding:48px;color:${T.muted};background:${T.surface};border:1px solid ${T.border};border-radius:14px">No students in <strong>${selCls}</strong> are enrolled in <strong>${subj}</strong></div>`
     :`<div style="display:grid;gap:10px">${myStudents.map(s=>{
       const st=attendance[s.id]?.[attFilter.date]||"absent";
-      const sc={present:T.green,absent:T.red,late:T.yellow}[st];
+      const sc={present:T.green,absent:T.red,leave:T.yellow}[st]||T.muted;
       return `<div style="background:${T.surface};border:1px solid ${T.border};border-radius:14px;padding:14px 18px;box-shadow:${T.shadow};display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-left:4px solid ${sc}">
         <div style="display:flex;align-items:center;gap:12px">${ava(s.name,38,s.photo||null)}
           <div><div style="font-weight:700;font-size:14px">${esc(s.name)}</div>
-          <div style="font-size:11px;color:${T.muted}">Roll# ${s.rollNo} · ${s.cls} · <span style="color:${T.accent}">${s.subjectGroup||""}</span></div></div></div>
+          <div style="font-size:11px;color:${T.muted}">Roll# ${s.rollNo} · ${s.cls} · <span style="color:${T.accent};font-weight:600">${s.subjectGroup||""}</span></div></div></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${badge(st)}
-          ${["present","absent","late"].map(opt=>`<button onclick="markAtt('${s.id}','${opt}')"
-            style="background:${st===opt?(opt==="present"?T.greenL:opt==="absent"?T.redL:T.yellowL):"#fff"};color:${st===opt?(opt==="present"?T.green:opt==="absent"?T.red:T.yellow):T.muted};border:1.5px solid ${st===opt?(opt==="present"?T.green:opt==="absent"?T.red:T.yellow):T.border};border-radius:8px;padding:5px 12px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize">${opt}</button>`).join("")}
+          ${["present","absent","leave"].map(opt=>`<button onclick="markAtt('${s.id}','${opt}')"
+            style="background:${st===opt?(opt==="present"?T.greenL:opt==="absent"?T.redL:T.yellowL):"#fff"};color:${st===opt?(opt==="present"?T.green:opt==="absent"?T.red:T.yellow):T.muted};border:1.5px solid ${st===opt?(opt==="present"?T.green:opt==="absent"?T.red:T.yellow):T.border};border-radius:8px;padding:5px 12px;cursor:pointer;font-weight:700;font-size:11px;font-family:'Plus Jakarta Sans',sans-serif;text-transform:capitalize">${opt==="leave"?"🏖️ Leave":opt==="present"?"✅ Present":"❌ Absent"}</button>`).join("")}
           ${dbtn("⚠️",`openComplaint('${s.id}')`, "sm")}</div>
       </div>`;}).join("")}</div>`}`;
 }
@@ -1237,6 +1303,10 @@ function renderTeacherSubjectAttendance(t){
 function renderTeacherSubjectGrades(t){
   if(!t)return`<div style="padding:40px;text-align:center;color:${T.red}">Teacher not found</div>`;
   const subj=t.subject;
+  // Assigned classes set by admin (fallback: all classes)
+  const assignedCls=t.assignedClasses&&t.assignedClasses.length>0?t.assignedClasses:CLASSES;
+  // Ensure the selected class filter is from assigned classes
+  if(!gradesFilter.cls||!assignedCls.includes(gradesFilter.cls))gradesFilter.cls=assignedCls[0];
   const myStudents=students.filter(s=>(SUBJECT_GROUPS[s.subjectGroup||"Computer Science"]||[]).includes(subj));
   // Exams for this subject (teacher can pick which exam to grade against)
   const subjExams=exams.filter(e=>e.subject===subj);
@@ -1257,10 +1327,10 @@ function renderTeacherSubjectGrades(t){
       </select>
     </div>
     <div>
-      <label style="font-size:11px;color:${T.muted};display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase">Class Filter</label>
+      <label style="font-size:11px;color:${T.muted};display:block;margin-bottom:5px;font-weight:700;text-transform:uppercase">Assigned Class</label>
       <select onchange="gradesFilter.cls=this.value;refreshContent()" style="background:#fff;border:1.5px solid ${T.border};border-radius:10px;padding:9px 14px;color:${T.text};font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif">
-        <option value="ALL" ${(gradesFilter.cls||"ALL")==="ALL"?"selected":""}>All Classes</option>
-        ${CLASSES.map(cl=>`<option value="${cl}" ${gradesFilter.cls===cl?"selected":""}>${cl}</option>`).join("")}
+        <option value="ALL" ${(gradesFilter.cls||"ALL")==="ALL"?"selected":""}>All Assigned Classes</option>
+        ${assignedCls.map(cl=>`<option value="${cl}" ${gradesFilter.cls===cl?"selected":""}>${cl}</option>`).join("")}
       </select>
     </div>
   </div>
@@ -1454,10 +1524,10 @@ function renderStudentDash(s){
 
 function renderStudentAtt(s){
   const ma=attendance[s.id]||{},dates=Object.keys(ma);
-  const pd=dates.filter(d=>ma[d]==="present").length,ad=dates.filter(d=>ma[d]==="absent").length,ld=dates.filter(d=>ma[d]==="late").length;
+  const pd=dates.filter(d=>ma[d]==="present").length,ad=dates.filter(d=>ma[d]==="absent").length,ld=dates.filter(d=>ma[d]==="leave").length;
   const pct=dates.length?Math.round(pd/dates.length*100):0;
   const dayLabels=dates.map(d=>new Date(d).toLocaleDateString("en",{weekday:"short"}));
-  const attBarData=dates.map(d=>ma[d]==="present"?100:ma[d]==="late"?50:0);
+  const attBarData=dates.map(d=>ma[d]==="present"?100:ma[d]==="leave"?50:0);
   scheduleChart(()=>drawBarChart('sAttTrend',dayLabels,[{label:'Attendance',data:attBarData,color:T.accent}],{maxVal:100}));
   return `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
     ${statCard("📊",`${pct}%`,"Overall",pct>=75?T.green:T.red)}${statCard("✅",pd,"Present",T.green)}${statCard("❌",ad,"Absent",T.red)}${statCard("⏰",ld,"Late",T.yellow)}
@@ -1596,6 +1666,16 @@ function renderModal(){
       <div style="flex:1"><label style="display:inline-flex;align-items:center;gap:8px;background:${T.bg};border:1.5px solid ${T.border};border-radius:10px;padding:9px 16px;cursor:pointer;font-size:12px;font-weight:700;color:${T.accent}">📷 Choose Photo<input type="file" accept="image/*" style="display:none" onchange="previewTeacherPhoto(this)"/></label>
       <div style="font-size:11px;color:${T.muted};margin-top:5px">JPG, PNG · Max 2MB</div></div></div></div>
     ${fld("Full Name","f-name",formData.name||"")}${fld("Subject","f-subject",formData.subject||SUBJECTS[0],"text",SUBJECTS)}${fld("Department","f-dept",formData.dept||"")}${fld("Qualification","f-qualification",formData.qualification||"")}${fld("Phone","f-phone",formData.phone||"")}${fld("Email","f-email",formData.email||"")}
+    <div style="margin-bottom:16px">
+      <label style="font-size:11px;color:${T.muted};display:block;margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">🏫 Assign Classes (select classes this teacher will teach)</label>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="cls-assign-grid">
+        ${CLASSES.map(cl=>{const checked=(formData.assignedClasses||[]).includes(cl);return `<label id="cls-lbl-${cl}" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${checked?T.accentL:T.bg};border:1.5px solid ${checked?T.accent:T.border};border-radius:10px;cursor:pointer;transition:all .15s" onclick="toggleAssignClass('${cl}',this)">
+          <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${checked?T.accent:T.border};background:${checked?T.accent:"#fff"};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:800" id="cls-chk-${cl}">${checked?"✓":""}</div>
+          <span style="font-size:13px;font-weight:700;color:${T.text}">${cl}</span>
+        </label>`;}).join("")}
+      </div>
+      <div style="font-size:11px;color:${T.muted};margin-top:6px">Selected: <strong id="cls-count-add">${(formData.assignedClasses||[]).length||0}</strong> class(es)</div>
+    </div>
     <button onclick="submitAddTeacher()" style="width:100%;background:linear-gradient(135deg,${T.accent},${T.accentD});color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer">Add Teacher</button>`;}
 
   if(modalState==="addExam"){title="📝 Schedule Exam";content=`
@@ -1645,6 +1725,16 @@ function renderModal(){
       <label style="display:inline-flex;align-items:center;gap:8px;background:${T.bg};border:1.5px solid ${T.border};border-radius:10px;padding:9px 16px;cursor:pointer;font-size:12px;font-weight:700;color:${T.accent}">📷 Change Photo<input type="file" accept="image/*" style="display:none" onchange="previewEditTeachPhoto(this)"/></label>
     </div>
     ${fld("Full Name","f-name",t.name||"")}${fld("Subject","f-subject",t.subject||SUBJECTS[0],"text",SUBJECTS)}${fld("Department","f-dept",t.dept||"")}${fld("Qualification","f-qualification",t.qualification||"")}${fld("Phone","f-phone",t.phone||"")}${fld("Email","f-email",t.email||"")}
+    <div style="margin-bottom:16px">
+      <label style="font-size:11px;color:${T.muted};display:block;margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">🏫 Assigned Classes</label>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="cls-assign-grid-edit">
+        ${CLASSES.map(cl=>{const checked=(t.assignedClasses||[]).includes(cl);return `<label id="cls-lbl-edit-${cl}" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${checked?T.accentL:T.bg};border:1.5px solid ${checked?T.accent:T.border};border-radius:10px;cursor:pointer;transition:all .15s" onclick="toggleAssignClassEdit('${cl}',this)">
+          <div style="width:18px;height:18px;border-radius:5px;border:2px solid ${checked?T.accent:T.border};background:${checked?T.accent:"#fff"};flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:800" id="cls-chk-edit-${cl}">${checked?"✓":""}</div>
+          <span style="font-size:13px;font-weight:700;color:${T.text}">${cl}</span>
+        </label>`;}).join("")}
+      </div>
+      <div style="font-size:11px;color:${T.muted};margin-top:6px">Selected: <strong id="cls-count-edit">${(t.assignedClasses||[]).length||0}</strong> class(es)</div>
+    </div>
     <button onclick="submitEditTeacher('${t.id}')" style="width:100%;background:linear-gradient(135deg,${T.accent},${T.accentD});color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px">💾 Save Changes</button>`;}
 
   if(modalState==="addComplaint"){
@@ -1793,7 +1883,7 @@ function setForm(id,val){formData[id.replace("f-","")]=val;}
 
 function openModal(type){
   if(type==="addStudent")formData={name:"",cls:"CS-A",subjectGroup:"Computer Science",phone:"",guardianPhone:"",email:"",feeStatus:"pending",dob:"",password:"1234",_photoData:null};
-  else if(type==="addTeacher")formData={name:"",subject:SUBJECTS[0],dept:"Computer Science",phone:"",email:"",qualification:"",_photoData:null};
+  else if(type==="addTeacher")formData={name:"",subject:SUBJECTS[0],dept:"Computer Science",phone:"",email:"",qualification:"",_photoData:null,assignedClasses:[]};
   else if(type==="addExam")formData={title:"",subject:SUBJECTS[0],cls:"CS-A",date:"",time:"09:00 AM",duration:"3 hours",room:"",totalMarks:"100"};
   else if(type==="addNotice")formData={title:"",type:"academic",author:"Principal"};
   else if(type==="addComplaint"){const cs=students.filter(s=>s.cls===attFilter.cls);formData={studentId:cs[0]?.id||"",message:""};}
@@ -1843,7 +1933,25 @@ function togglePermCheck(key,el){
   else{subAdminPermsSelected.push(key);chk.textContent="✓";chk.style.background=T.purple;chk.style.borderColor=T.purple;el.style.background=T.purpleL;el.style.borderColor="#c4b5fd";}
 }
 
-// ─── ADD SUB-ADMIN ───
+// ─── ASSIGN CLASS TOGGLES (for Add Teacher / Edit Teacher modals) ───
+function toggleAssignClass(cls,el){
+  if(!formData.assignedClasses)formData.assignedClasses=[];
+  const chk=document.getElementById("cls-chk-"+cls);
+  const idx=formData.assignedClasses.indexOf(cls);
+  if(idx>=0){formData.assignedClasses.splice(idx,1);if(chk){chk.textContent="";chk.style.background="#fff";chk.style.borderColor=T.border;}el.style.background=T.bg;el.style.borderColor=T.border;}
+  else{formData.assignedClasses.push(cls);if(chk){chk.textContent="✓";chk.style.background=T.accent;chk.style.borderColor=T.accent;}el.style.background=T.accentL;el.style.borderColor=T.accent;}
+  const cnt=document.getElementById("cls-count-add");if(cnt)cnt.textContent=formData.assignedClasses.length;
+}
+function toggleAssignClassEdit(cls,el){
+  if(!formData.assignedClasses)formData.assignedClasses=[];
+  const chk=document.getElementById("cls-chk-edit-"+cls);
+  const idx=formData.assignedClasses.indexOf(cls);
+  if(idx>=0){formData.assignedClasses.splice(idx,1);if(chk){chk.textContent="";chk.style.background="#fff";chk.style.borderColor=T.border;}el.style.background=T.bg;el.style.borderColor=T.border;}
+  else{formData.assignedClasses.push(cls);if(chk){chk.textContent="✓";chk.style.background=T.accent;chk.style.borderColor=T.accent;}el.style.background=T.accentL;el.style.borderColor=T.accent;}
+  const cnt=document.getElementById("cls-count-edit");if(cnt)cnt.textContent=formData.assignedClasses.length;
+}
+
+
 function submitAddSubAdmin(){
   const name=(document.getElementById("f-name")?.value||"").trim();
   const username=(document.getElementById("f-username")?.value||"").trim();
@@ -1891,7 +1999,7 @@ function previewEditTeachPhoto(input){const file=input.files[0];if(!file)return;
 
 // ─── EDIT STUDENT / TEACHER ───
 function openEditStudent(sid){const s=students.find(x=>x.id===sid);if(s){formData={...s,_photoData:null};modalState="editStudent";render();}}
-function openEditTeacher(tid){const t=teachers.find(x=>x.id===tid);if(t){formData={...t,_photoData:null};modalState="editTeacher";render();}}
+function openEditTeacher(tid){const t=teachers.find(x=>x.id===tid);if(t){formData={...t,_photoData:null,assignedClasses:[...(t.assignedClasses||CLASSES)]};modalState="editTeacher";render();}}
 function confirmDelStudent(sid){if(confirm("Are you sure you want to delete this student?")){students=students.filter(s=>s.id!==sid);if(modalState==="viewStudent"||modalState==="editStudent"){closeModal();}else{refreshContent();}}}
 function changeStudentPhoto(sid,input){const file=input.files[0];if(!file)return;if(file.size>2*1024*1024){alert("Photo too large.");return;}const reader=new FileReader();reader.onload=ev=>{const s=students.find(x=>x.id===sid);if(s){s.photo=ev.target.result;formData={...s};}render();};reader.readAsDataURL(file);}
 
@@ -1911,6 +2019,8 @@ function submitEditTeacher(tid){
   const name=g("f-name").trim();if(!name){alert("Name cannot be empty");return;}
   t.name=name;t.subject=g("f-subject")||t.subject;t.dept=g("f-dept")||t.dept;t.qualification=g("f-qualification")||t.qualification;t.phone=g("f-phone")||t.phone;t.email=g("f-email")||t.email;
   if(formData._photoData)t.photo=formData._photoData;
+  // Save assigned classes from formData (set by toggleAssignClassEdit)
+  if(formData.assignedClasses&&formData.assignedClasses.length>=0)t.assignedClasses=[...formData.assignedClasses];
   if(currentUser&&currentUser.id===tid){currentUser.name=t.name;if(t.photo)currentUser.photo=t.photo;}
   alert("✅ Teacher updated!");closeModal();
 }
@@ -1966,8 +2076,8 @@ function submitAddStudent(){
 function submitAddTeacher(){
   const name=(document.getElementById("f-name")?.value||"").trim();if(!name){alert("Please enter teacher name");return;}
   const newId="T"+String(teachers.length+1).padStart(3,"0");const pwd="teach"+String(teachers.length+1);
-  teachers.push({id:newId,name,subject:document.getElementById("f-subject")?.value||SUBJECTS[0],dept:document.getElementById("f-dept")?.value||"",qualification:document.getElementById("f-qualification")?.value||"",phone:document.getElementById("f-phone")?.value||"",email:document.getElementById("f-email")?.value||"",joinDate:today,password:pwd,portal:"active",photo:formData._photoData||null});
-  alert(`✅ Teacher Added!\nID: ${newId}\nPassword: ${pwd}`);closeModal();
+  teachers.push({id:newId,name,subject:document.getElementById("f-subject")?.value||SUBJECTS[0],dept:document.getElementById("f-dept")?.value||"",qualification:document.getElementById("f-qualification")?.value||"",phone:document.getElementById("f-phone")?.value||"",email:document.getElementById("f-email")?.value||"",joinDate:today,password:pwd,portal:"active",photo:formData._photoData||null,assignedClasses:formData.assignedClasses&&formData.assignedClasses.length>0?[...formData.assignedClasses]:[...CLASSES]});
+  alert(`✅ Teacher Added!\nID: ${newId}\nPassword: ${pwd}\nAssigned Classes: ${formData.assignedClasses&&formData.assignedClasses.length>0?formData.assignedClasses.join(", "):"All"}`);closeModal();
 }
 function submitAddExam(){
   const title=(document.getElementById("f-title")?.value||"").trim();if(!title){alert("Please enter exam title");return;}
@@ -2019,7 +2129,7 @@ function downloadReportExcel(){
     filename=`Attendance_${cls}_${reportFilter.month.replace(" ","_")}.csv`;
     const dates=weekDays;
     csv="Roll#,Student Name,Class,"+dates.map(d=>d.slice(5)).join(",")+",Present,Absent,Late,%,Status\n";
-    rStudents.forEach(s=>{const myA=attendance[s.id]||{};const pres=dates.filter(d=>myA[d]==="present").length;const abs=dates.filter(d=>myA[d]==="absent").length;const late=dates.filter(d=>myA[d]==="late").length;const pct=dates.length?Math.round(pres/dates.length*100):0;csv+=`"${s.rollNo}","${s.name}","${s.cls}",${dates.map(d=>{const st=myA[d]||"A";return st==="present"?"P":st==="late"?"L":"A";}).join(",")},${pres},${abs},${late},${pct}%,"${pct>=75?"Regular":"Short"}"\n`;});
+    rStudents.forEach(s=>{const myA=attendance[s.id]||{};const pres=dates.filter(d=>myA[d]==="present").length;const abs=dates.filter(d=>myA[d]==="absent").length;const late=dates.filter(d=>myA[d]==="leave").length;const pct=dates.length?Math.round(pres/dates.length*100):0;csv+=`"${s.rollNo}","${s.name}","${s.cls}",${dates.map(d=>{const st=myA[d]||"A";return st==="present"?"P":st==="leave"?"L":"A";}).join(",")},${pres},${abs},${late},${pct}%,"${pct>=75?"Regular":"Short"}"\n`;});
   } else if(reportFilter.type==="grades"){
     filename=`GradeSheet_${cls}_2025-26.csv`;
     const subs=SUBJECTS.slice(0,5);
