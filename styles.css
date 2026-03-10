@@ -240,6 +240,13 @@ p, span, label, input, select, textarea, button {
   padding: 10px 8px;
   overflow-y: auto;
   list-style: none;
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge */
+}
+
+/* Chrome / Safari / Opera — hide sidebar scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  display: none;
 }
 
 /* Individual nav item */
@@ -393,16 +400,13 @@ p, span, label, input, select, textarea, button {
   padding: 28px;
 }
 
-/* Scrollbar styling */
+/* Hide scrollbar — content still scrolls */
+.main-content {
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE / Edge */
+}
 .main-content::-webkit-scrollbar {
-  width: 6px;
-}
-.main-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-.main-content::-webkit-scrollbar-thumb {
-  background: var(--border2);
-  border-radius: 99px;
+  display: none;               /* Chrome / Safari / Opera */
 }
 
 
@@ -734,7 +738,14 @@ td {
   max-width: 520px;
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE / Edge */
   box-shadow: 0 24px 64px rgba(0,0,0,.25);
+}
+
+/* Hide modal scrollbar — Chrome / Safari */
+.modal-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .modal-panel.modal-wide {
@@ -1643,6 +1654,13 @@ button,
     transition: transform .28s cubic-bezier(.4,0,.2,1) !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  /* Hide webkit scrollbar on mobile sidebar */
+  #app-sidebar::-webkit-scrollbar {
+    display: none;
   }
 
   /* Force full labels visible in open drawer */
