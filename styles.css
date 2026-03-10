@@ -1598,7 +1598,386 @@ button,
 
 
 /* ================================================================
-  26. Print Styles
+  26. Responsive Styles
+   ================================================================
+
+   SIDEBAR BEHAVIOUR
+   ─────────────────
+   > 1024px  Desktop   : Full 240px sidebar always visible.
+   ≤ 1024px  Tablet    : Sidebar collapses to 64px icon strip.
+   ≤  768px  Mobile    : Sidebar hidden. Hamburger (☰) in header
+                         OR the 🎓 brand icon in sidebar toggles
+                         body.sidebar-open → slides drawer in.
+                         Backdrop tap closes it.
+
+   LOGIN PAGE
+   ──────────
+   > 768px  : Two-column layout (branding left + form right).
+   ≤ 768px  : Left branding panel hidden; form fills full screen.
+
+   BREAKPOINTS
+   ───────────
+     ≤ 480px  xs — very small phones
+     ≤ 640px  sm — phones
+     ≤ 768px  md — large phones / small tablets
+     ≤ 1024px lg — tablets / small laptops
+     > 1024px xl — desktops (base styles above)
+   ================================================================ */
+
+
+/* ================================================================
+   SIDEBAR DRAWER — Mobile overlay state
+   Controlled by toggling body.sidebar-open via JS
+   ================================================================ */
+
+/* Sidebar hidden off-screen on mobile by default */
+@media (max-width: 768px) {
+  #app-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 240px !important;
+    z-index: 999 !important;
+    transform: translateX(-100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Force full labels visible in open drawer */
+  #app-sidebar .nav-item {
+    justify-content: flex-start !important;
+    padding: 11px 12px !important;
+    white-space: nowrap !important;
+  }
+
+  #app-sidebar .nav-item span:last-child {
+    display: inline !important;
+  }
+
+  /* Slide in when open */
+  body.sidebar-open #app-sidebar {
+    transform: translateX(0) !important;
+  }
+
+  /* Show backdrop when open */
+  body.sidebar-open #sidebar-backdrop {
+    display: block !important;
+  }
+
+  /* Show hamburger button */
+  #mobile-hamburger {
+    display: flex !important;
+  }
+
+  /* Shell: full width since sidebar is out of flow */
+  #nexus-shell {
+    display: block !important;
+  }
+
+  #nexus-shell > div:last-of-type {
+    width: 100% !important;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+/* Slide-open animation for the sidebar */
+#app-sidebar {
+  transition: transform .28s cubic-bezier(.4,0,.2,1), width .25s ease;
+}
+
+
+/* ================================================================
+   LOGIN PAGE — hide left panel on mobile
+   ================================================================ */
+@media (max-width: 768px) {
+  #nexus-login-left {
+    display: none !important;
+  }
+
+  #nexus-login-right {
+    width: 100% !important;
+    min-height: 100vh !important;
+    padding: 48px 24px 36px !important;
+    justify-content: flex-start !important;
+    padding-top: 60px !important;
+  }
+
+  #nexus-login-wrap {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  #nexus-login-right {
+    padding: 36px 16px 24px !important;
+  }
+}
+
+
+/* ================================================================
+   TABLET / SMALL LAPTOP  (≤ 1024px)
+   Sidebar icon-only; grids tighten.
+   ================================================================ */
+@media (max-width: 1024px) {
+
+  /* Header */
+  #app-header { padding: 0 18px !important; }
+
+  /* Main content */
+  #main-content { padding: 20px !important; }
+
+  /* Card grids */
+  .cards-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+  .cards-grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Fee stats 5 → 3 col */
+  .fee-stats-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* Report KPI */
+  .report-kpi-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* Login panel narrower */
+  #nexus-login-right { width: 420px !important; padding: 40px 32px !important; }
+}
+
+
+/* ================================================================
+   MOBILE  (≤ 768px)
+   Full responsive layout for phones and small tablets.
+   ================================================================ */
+@media (max-width: 768px) {
+
+  /* Header */
+  #app-header {
+    padding: 0 12px !important;
+    gap: 8px !important;
+    height: 60px !important;
+  }
+
+  /* Hide verbose header text */
+  #header-date { display: none !important; }
+  #header-username { display: none !important; }
+  #header-pwd-btn { display: none !important; }
+
+  /* Main content */
+  #main-content { padding: 14px !important; }
+
+  /* Card grids → 2 col */
+  .cards-grid-2,
+  .cards-grid-3,
+  .cards-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .cards-grid-auto {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  }
+
+  /* Fee stats → 3 col */
+  .fee-stats-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .fee-stat-tile { padding: 12px 8px !important; }
+  .fee-stat-tile .tile-value { font-size: 20px !important; }
+
+  /* Stat cards */
+  .stat-card { padding: 16px 12px !important; }
+  .stat-card .stat-value { font-size: 24px !important; }
+  .stat-card .stat-icon { width: 38px !important; height: 38px !important; font-size: 16px !important; }
+
+  /* Tables */
+  .table-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+  th, td { padding: 9px 10px !important; font-size: 12px !important; }
+
+  /* Filter bars stack */
+  .filter-bar,
+  .attendance-filters,
+  .report-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 9px !important;
+    padding: 12px !important;
+  }
+
+  .filter-bar > *,
+  .attendance-filters > *,
+  .report-controls > * { width: 100% !important; }
+
+  .search-wrapper { min-width: unset !important; width: 100% !important; }
+
+  /* Section title */
+  .section-title { flex-wrap: wrap !important; gap: 8px !important; }
+  .section-title h2 { font-size: 15px !important; }
+
+  /* Modal → bottom sheet */
+  .modal-overlay { padding: 0 !important; align-items: flex-end !important; }
+  .modal-panel,
+  .modal-panel.modal-wide {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    padding: 22px 18px !important;
+    border-radius: 20px 20px 0 0 !important;
+  }
+  .modal-title { font-size: 17px !important; }
+
+  /* Cards */
+  .card { padding: 16px !important; }
+  .fee-card { padding: 16px !important; }
+  .assignment-card { padding: 16px !important; }
+
+  /* Report KPI */
+  .report-kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .report-content { padding: 16px !important; }
+  .report-heading .report-title { font-size: 18px !important; }
+
+  /* Notice cards */
+  .notice-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 14px !important;
+  }
+
+  /* Attendance */
+  .attendance-row { padding: 11px 12px !important; gap: 8px !important; }
+
+  /* Empty states */
+  .empty-state { padding: 36px 16px !important; }
+  .access-denied { padding: 36px 16px !important; }
+
+  /* Dashboard charts: stack */
+  #main-content [style*="grid-template-columns:1fr 1fr"] {
+    display: block !important;
+  }
+  #main-content [style*="grid-template-columns:1fr 1fr"] > * {
+    margin-bottom: 12px !important;
+  }
+
+  /* Disable hover lifts on touch */
+  .stat-card:hover,
+  .card-hover:hover,
+  .fee-stat-tile:hover { transform: none !important; }
+}
+
+
+/* ================================================================
+   PHONES  (≤ 640px)
+   ================================================================ */
+@media (max-width: 640px) {
+
+  /* All card grids → single column */
+  .cards-grid-2,
+  .cards-grid-3,
+  .cards-grid-4,
+  .cards-grid-auto { grid-template-columns: 1fr !important; gap: 9px !important; }
+
+  /* Fee stats → 2 col */
+  .fee-stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 7px !important; }
+  .fee-stat-tile .tile-label { font-size: 9px !important; }
+  .fee-stat-tile .tile-value { font-size: 18px !important; }
+
+  /* Stat cards */
+  .stat-card .stat-value { font-size: 20px !important; }
+
+  /* Tables tighter */
+  th, td { padding: 8px 8px !important; font-size: 11px !important; }
+  th { white-space: normal !important; min-width: 50px !important; }
+
+  /* Main content */
+  #main-content { padding: 10px !important; }
+
+  /* Cards */
+  .card { padding: 13px !important; }
+  .stat-card { padding: 13px 10px !important; }
+
+  /* Section title */
+  .section-title h2 { font-size: 13px !important; }
+  .section-title { margin-bottom: 10px !important; }
+
+  /* Login form */
+  #nexus-login-right { padding: 36px 16px 24px !important; }
+
+  /* Modal */
+  .modal-panel { padding: 18px 14px !important; max-height: 94vh !important; }
+  .modal-title { font-size: 15px !important; }
+
+  /* Report KPI single col */
+  .report-kpi-grid { grid-template-columns: 1fr !important; }
+  .report-kpi-value { font-size: 20px !important; }
+
+  /* Fee / assign */
+  .fee-card { padding: 13px !important; }
+  .assignment-card { padding: 13px !important; }
+
+  /* Grade input larger touch target */
+  .grade-input { width: 42px !important; padding: 6px 3px !important; }
+
+  /* Buttons smaller */
+  .btn-primary { padding: 8px 14px !important; font-size: 12px !important; }
+  .btn-outline  { padding: 7px 12px !important; font-size: 12px !important; }
+
+  /* Banners */
+  .info-banner, .warn-banner { font-size: 11px !important; padding: 9px 11px !important; }
+
+  /* Empty states */
+  .empty-state { padding: 28px 14px !important; }
+  .empty-state .empty-icon { font-size: 38px !important; }
+}
+
+
+/* ================================================================
+   VERY SMALL PHONES  (≤ 480px)
+   ================================================================ */
+@media (max-width: 480px) {
+
+  /* Header */
+  #app-header { padding: 0 9px !important; height: 56px !important; }
+
+  /* Main content */
+  #main-content { padding: 8px !important; }
+
+  /* Fee stats still 2-col, tightest */
+  .fee-stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+  .fee-stat-tile { padding: 9px 6px !important; }
+  .fee-stat-tile .tile-value { font-size: 15px !important; }
+  .fee-stat-tile .tile-label { font-size: 8px !important; }
+
+  /* Stat cards */
+  .stat-card { padding: 11px 9px !important; }
+  .stat-card .stat-value { font-size: 18px !important; }
+  .stat-card .stat-icon { width: 30px !important; height: 30px !important; font-size: 13px !important; top: 9px !important; right: 9px !important; }
+
+  /* Avatars */
+  .avatar-xl { width: 46px !important; height: 46px !important; font-size: 16px !important; }
+  .avatar-lg  { width: 36px !important; height: 36px !important; font-size: 13px !important; }
+
+  /* Tables */
+  th, td { padding: 7px 6px !important; font-size: 10.5px !important; }
+
+  /* Modal */
+  .modal-panel { padding: 16px 12px !important; }
+
+  /* Report */
+  .report-heading .report-title { font-size: 15px !important; }
+
+  /* All hover transforms off on touch */
+  .stat-card:hover,
+  .card-hover:hover,
+  .fee-stat-tile:hover,
+  .login-role-btn:hover { transform: none !important; box-shadow: none !important; }
+}
+
+
+/* ================================================================
+  27. Print Styles
    ================================================================ */
 
 @media print {
