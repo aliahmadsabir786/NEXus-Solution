@@ -443,7 +443,20 @@ function canAccess(page){
 // ================================================================
 function renderShell(){
   const nav=getNav(),sw=sidebarCollapsed?64:240,lbl=nav.find(n=>n.key===currentPage)?.label||"";
-  return `<div id="nexus-shell" style="display:flex;height:100vh;overflow:hidden">
+  return `<style>
+@media(max-width:768px){
+  #app-sidebar{position:fixed!important;top:0;left:0;height:100vh!important;z-index:999;transform:translateX(-100%);transition:transform .25s!important;width:240px!important;}
+  body.sidebar-open #app-sidebar{transform:translateX(0)!important;}
+  #nexus-shell{display:block!important;}
+  #app-main-col{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  #stuAttStats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}
+  #stuAttStats .card-hover{padding:14px 12px!important;}
+  #stuAttStats .card-hover div[style*="position:absolute"]{display:none!important;}
+  #stuAttStats .card-hover div[style*="font-size:30px"]{font-size:22px!important;}
+  #stuAttStats .card-hover div[style*="font-size:13px"]{font-size:12px!important;}
+}
+</style>
+<div id="nexus-shell" style="display:flex;height:100vh;overflow:hidden">
   <div id="app-sidebar" style="width:${sw}px;background:${T.sidebar};display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;box-shadow:4px 0 20px rgba(6,78,59,.3);transition:width .25s">
     <div style="padding:18px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px;justify-content:${sidebarCollapsed?"center":"flex-start"};height:68px;flex-shrink:0">
       <div data-sidebar-toggle title="Toggle menu" style="width:36px;height:36px;background:linear-gradient(135deg,${T.accent},${T.accentD});border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">🎓</div>
@@ -455,7 +468,7 @@ function renderShell(){
     ${!sidebarCollapsed?`<div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.08)"><div style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(255,255,255,.07);border-radius:10px">${ava(currentUser.name,32,getUserPhoto())}<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(currentUser.name)}</div><div style="font-size:10px;color:${T.sidebarText};opacity:.6;text-transform:capitalize">${currentUser.isSubAdmin?"Sub-Admin":currentUser.role}</div></div></div></div>`:""}
     <div style="padding:10px 8px;border-top:1px solid rgba(255,255,255,.08)"><div onclick="toggleSidebar()" style="display:flex;align-items:center;justify-content:center;padding:8px;border-radius:10px;cursor:pointer;background:rgba(255,255,255,.06);color:${T.sidebarText};font-size:16px">${sidebarCollapsed?"→":"←"}</div></div>
   </div>
-  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:${T.bg}">
+  <div id="app-main-col" style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:${T.bg}">
     <div id="app-header" style="background:#fff;border-bottom:1px solid ${T.border};padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:68px;flex-shrink:0;box-shadow:0 1px 8px rgba(5,150,105,.06)">
       <div style="display:flex;align-items:center;gap:12px">
         <button id="mobile-hamburger" data-sidebar-toggle onclick="event.stopPropagation()" style="display:none;align-items:center;justify-content:center;width:38px;height:38px;background:${T.accentL};border:1.5px solid ${T.border2};border-radius:10px;cursor:pointer;font-size:18px;color:${T.accentD};flex-shrink:0">☰</button>
@@ -507,7 +520,7 @@ function getNav(){
       const allNav=[{key:"dashboard",icon:"📊",label:"Dashboard"},...SUB_ADMIN_PERMS.filter(p=>perms.includes(p.key)).map(p=>({key:p.key,icon:p.label.split(" ")[0],label:p.label.replace(/^[^ ]+ /,"")}))]
       return allNav;
     }
-    return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"students",icon:"🎓",label:"Students"},{key:"teachers",icon:"👨‍🏫",label:"Teachers"},{key:"exams",icon:"📝",label:"Exams"},{key:"grades",icon:"📈",label:"Grades"},{key:"fees",icon:"💳",label:"Fees"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"notices",icon:"📢",label:"Notices"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"reports",icon:"📋",label:"Reports"},{key:"portals",icon:"🔐",label:"Portal Access"},{key:"subadmins",icon:"👥",label:"Sub-Admins"},{key:"settings",icon:"⚙️",label:"Settings"}];
+    return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"students",icon:"🎓",label:"Students"},{key:"teachers",icon:"👨‍🏫",label:"Teachers"},{key:"exams",icon:"📝",label:"Exams"},{key:"grades",icon:"📈",label:"Grades"},{key:"fees",icon:"💳",label:"Fees"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"notices",icon:"📢",label:"Notices"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"reports",icon:"📋",label:"Reports"},{key:"portals",icon:"🔐",label:"Portal Access"},{key:"subadmins",icon:"👥",label:"Sub-Admins"},{key:"settings",icon:"⚙️",label:"Settings"}];
   }
   if(currentUser.role==="teacher")return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"attendance",icon:"📋",label:"Mark Attendance"},{key:"grades",icon:"📈",label:"Enter Grades"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"timetable",icon:"🕐",label:"My Timetable"},{key:"notices",icon:"📢",label:"Notices"}];
   return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"attendance",icon:"📋",label:"My Attendance"},{key:"grades",icon:"📈",label:"My Grades"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"fees",icon:"💳",label:"Fee Vouchers"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"exams",icon:"📝",label:"Exams"},{key:"notices",icon:"📢",label:"Notices"}];
@@ -580,7 +593,6 @@ function renderAdminDash(){
     ${statCard("👨‍🏫",teachers.length,"Teachers",T.purple,"5 departments")}
     ${statCard("✅",tp,"Present Today",T.green,`${students.length-tp} absent`)}
     ${statCard("💳",`${pc}/${students.length}`,"Fee Paid",T.yellow,`${students.filter(s=>s.feeStatus==="overdue").length} overdue`)}
-    ${statCard("📎",assignments.length,"Assignments",T.blue,`${pendingGrade} pending grade`)}
     ${statCard("⚠️",complaints.length,"Complaints",T.red,"Pending")}
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
@@ -1529,8 +1541,8 @@ function renderStudentAtt(s){
   const dayLabels=dates.map(d=>new Date(d).toLocaleDateString("en",{weekday:"short"}));
   const attBarData=dates.map(d=>ma[d]==="present"?100:ma[d]==="leave"?50:0);
   scheduleChart(()=>drawBarChart('sAttTrend',dayLabels,[{label:'Attendance',data:attBarData,color:T.accent}],{maxVal:100}));
-  return `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
-    ${statCard("📊",`${pct}%`,"Overall",pct>=75?T.green:T.red)}${statCard("✅",pd,"Present",T.green)}${statCard("❌",ad,"Absent",T.red)}${statCard("⏰",ld,"Late",T.yellow)}
+  return `<div id="stuAttStats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+    ${statCard("📊",`${pct}%`,"Overall",pct>=75?T.green:T.red)}${statCard("✅",pd,"Present",T.green)}${statCard("❌",ad,"Absent",T.red)}${statCard("🏖️",ld,"Leave",T.yellow)}
   </div>
   ${pct<75?`<div style="background:${T.redL};border:1px solid #fca5a5;border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;gap:10px;align-items:center"><span style="font-size:20px">⚠️</span><div><strong style="color:${T.red}">Low Attendance Warning!</strong><span style="font-size:13px;color:${T.red};margin-left:6px">Below 75%.</span></div></div>`:""}
   ${card(`${secTitle("Attendance Trend")}<canvas id="sAttTrend" width="600" height="160" style="width:100%;height:160px"></canvas>`,"margin-bottom:16px")}
