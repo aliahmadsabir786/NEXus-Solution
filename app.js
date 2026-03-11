@@ -451,7 +451,6 @@ function renderShell(){
   #app-main-col{height:100vh;display:flex;flex-direction:column;overflow:hidden;}
   #stuAttStats{grid-template-columns:repeat(2,1fr)!important;gap:10px!important;}
   #stuAttStats .card-hover{padding:14px 12px!important;}
-  #stuAttStats .card-hover div[style*="position:absolute"]{display:none!important;}
   #stuAttStats .card-hover div[style*="font-size:30px"]{font-size:22px!important;}
   #stuAttStats .card-hover div[style*="font-size:13px"]{font-size:12px!important;}
 }
