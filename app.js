@@ -606,11 +606,11 @@ function renderAdminClasses(){
       </td>
     </tr>`;
   }).join("");
-  const statCards=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px">
-    ${statCard("Total Classes",classesData.length,"🏫",T.accent)}
-    ${statCard("Total Students",students.length,"🎓",T.blue)}
-    ${statCard("Total Teachers",teachers.length,"👨‍🏫",T.purple)}
-    ${statCard("Avg Class Size",classesData.length?Math.round(students.length/classesData.length):0,"📊",T.green)}
+  const statCards=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px">
+    ${statCard("🏫",classesData.length,"Total Classes",T.accent)}
+    ${statCard("🎓",students.length,"Total Students",T.blue)}
+    ${statCard("👨‍🏫",teachers.length,"Total Teachers",T.purple)}
+    ${statCard("📊",classesData.length?Math.round(students.length/classesData.length):0,"Avg Class Size",T.green)}
   </div>`;
   return `${statCards}${card(`
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px">
