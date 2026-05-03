@@ -83,7 +83,14 @@ let teachers=[
   {id:"T004",name:"Ms. Rabia Nawaz",    subject:"Microeconomics",    dept:"Business Admin",  phone:"03214444444",email:"rabia@cms.edu", joinDate:"2019-06-20",qualification:"MBA",        password:"teach4",portal:"active",assignedClasses:["BBA-A","BBA-B"]},
   {id:"T005",name:"Dr. Imran Sheikh",   subject:"Physics",           dept:"Sciences",        phone:"03455555555",email:"imran@cms.edu", joinDate:"2012-09-01",qualification:"PhD Physics",password:"teach5",portal:"active",assignedClasses:["CS-A","CS-B","BBA-A","BBA-B"]},
 ];
-const CLASSES=["CS-A","CS-B","BBA-A","BBA-B"];
+let CLASSES=["CS-A","CS-B","BBA-A","BBA-B"];
+// Classes management: each class has metadata
+let classesData=[
+  {id:"CLS-CS-A",name:"CS-A",dept:"Computer Science",session:"2025-26",capacity:40,description:"Computer Science Section A"},
+  {id:"CLS-CS-B",name:"CS-B",dept:"Computer Science",session:"2025-26",capacity:40,description:"Computer Science Section B"},
+  {id:"CLS-BBA-A",name:"BBA-A",dept:"Business Administration",session:"2025-26",capacity:35,description:"BBA Section A"},
+  {id:"CLS-BBA-B",name:"BBA-B",dept:"Business Administration",session:"2025-26",capacity:35,description:"BBA Section B"},
+];
 const SUBJECTS=["English","Urdu","Islamiyat","Biology","Physics","Chemistry","Mathematics","Computer Science","Data Structures","Calculus","Statistics","OOP"];
 // Subject groups — each maps to the subjects a student in that program takes
 const SUBJECT_GROUPS={
@@ -519,7 +526,7 @@ function getNav(){
       const allNav=[{key:"dashboard",icon:"📊",label:"Dashboard"},...SUB_ADMIN_PERMS.filter(p=>perms.includes(p.key)).map(p=>({key:p.key,icon:p.label.split(" ")[0],label:p.label.replace(/^[^ ]+ /,"")}))]
       return allNav;
     }
-    return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"students",icon:"🎓",label:"Students"},{key:"teachers",icon:"👨‍🏫",label:"Teachers"},{key:"exams",icon:"📝",label:"Exams"},{key:"grades",icon:"📈",label:"Grades"},{key:"fees",icon:"💳",label:"Fees"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"notices",icon:"📢",label:"Notices"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"reports",icon:"📋",label:"Reports"},{key:"portals",icon:"🔐",label:"Portal Access"},{key:"subadmins",icon:"👥",label:"Sub-Admins"},{key:"settings",icon:"⚙️",label:"Settings"}];
+    return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"classes",icon:"🏫",label:"Classes"},{key:"students",icon:"🎓",label:"Students"},{key:"teachers",icon:"👨‍🏫",label:"Teachers"},{key:"exams",icon:"📝",label:"Exams"},{key:"grades",icon:"📈",label:"Grades"},{key:"fees",icon:"💳",label:"Fees"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"notices",icon:"📢",label:"Notices"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"reports",icon:"📋",label:"Reports"},{key:"portals",icon:"🔐",label:"Portal Access"},{key:"subadmins",icon:"👥",label:"Sub-Admins"},{key:"settings",icon:"⚙️",label:"Settings"}];
   }
   if(currentUser.role==="teacher")return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"attendance",icon:"📋",label:"Mark Attendance"},{key:"grades",icon:"📈",label:"Enter Grades"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"complaints",icon:"⚠️",label:"Complaints"},{key:"timetable",icon:"🕐",label:"My Timetable"},{key:"notices",icon:"📢",label:"Notices"}];
   return [{key:"dashboard",icon:"📊",label:"Dashboard"},{key:"attendance",icon:"📋",label:"My Attendance"},{key:"grades",icon:"📈",label:"My Grades"},{key:"assignments",icon:"📎",label:"Assignments"},{key:"fees",icon:"💳",label:"Fee Vouchers"},{key:"timetable",icon:"🕐",label:"Timetable"},{key:"exams",icon:"📝",label:"Exams"},{key:"notices",icon:"📢",label:"Notices"}];
@@ -551,6 +558,7 @@ function renderPage(){if(currentUser.role==="admin")return renderAdminPage();if(
 function renderAdminPage(){
   switch(currentPage){
     case "dashboard":   return renderAdminDash();
+    case "classes":     return (!currentUser.isSubAdmin)?renderAdminClasses():renderNoAccess();
     case "students":    return canAccess("students")?renderAdminStudents():renderNoAccess();
     case "teachers":    return canAccess("teachers")?renderAdminTeachers():renderNoAccess();
     case "attendance":  return canAccess("attendance")?renderAdminAttReport():renderNoAccess();
@@ -574,6 +582,61 @@ function renderNoAccess(){
 }
 
 // ─── ADMIN DASHBOARD ───
+function renderAdminClasses(){
+  const clsFilter=window._clsSearchQ||"";
+  const filtered=classesData.filter(c=>!clsFilter||c.name.toLowerCase().includes(clsFilter.toLowerCase())||c.dept.toLowerCase().includes(clsFilter.toLowerCase()));
+  const rows=filtered.map(c=>{
+    const stuCount=students.filter(s=>s.cls===c.name).length;
+    const teachCount=teachers.filter(t=>(t.assignedClasses||[]).includes(c.name)).length;
+    return `<tr style="border-bottom:1px solid ${T.border};transition:background .12s" onmouseover="this.style.background='${T.bg2}'" onmouseout="this.style.background=''">
+      <td style="padding:14px 12px;font-weight:700;color:${T.text}">${esc(c.name)}</td>
+      <td style="padding:14px 12px;color:${T.muted}">${esc(c.dept)}</td>
+      <td style="padding:14px 12px;color:${T.muted}">${esc(c.session)}</td>
+      <td style="padding:14px 12px"><span style="background:${T.blueL};color:${T.blue};border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700">${stuCount} students</span></td>
+      <td style="padding:14px 12px"><span style="background:${T.purpleL};color:${T.purple};border-radius:20px;padding:3px 12px;font-size:12px;font-weight:700">${teachCount} teachers</span></td>
+      <td style="padding:14px 12px;color:${T.muted};font-size:13px">${esc(c.capacity)}</td>
+      <td style="padding:14px 12px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="openClassDetail('${c.id}')" style="background:${T.accentL};color:${T.accentD};border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer">👁 View</button>
+          <button onclick="openManageStudents('${c.id}')" style="background:${T.blueL};color:${T.blue};border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer">🎓 Students</button>
+          <button onclick="openManageTeachers('${c.id}')" style="background:${T.purpleL};color:${T.purple};border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer">👨‍🏫 Teachers</button>
+          <button onclick="openEditClass('${c.id}')" style="background:${T.yellowL};color:${T.yellow};border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer">✏️</button>
+          <button onclick="delClass('${c.id}')" style="background:${T.redL};color:${T.red};border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+  const statCards=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px">
+    ${statCard("Total Classes",classesData.length,"🏫",T.accent)}
+    ${statCard("Total Students",students.length,"🎓",T.blue)}
+    ${statCard("Total Teachers",teachers.length,"👨‍🏫",T.purple)}
+    ${statCard("Avg Class Size",classesData.length?Math.round(students.length/classesData.length):0,"📊",T.green)}
+  </div>`;
+  return `${statCards}${card(`
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:18px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:18px;color:${T.text}">🏫 Classes</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input id="cls-search" value="${esc(clsFilter)}" oninput="window._clsSearchQ=this.value;refreshContent()" placeholder="Search class…" style="padding:8px 12px;border:1.5px solid ${T.border};border-radius:10px;font-size:13px;outline:none;width:180px"/>
+        ${pbtn("+ Add Class","openModal('addClass')")}
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="background:${T.bg2}">
+        <th style="padding:10px 12px;text-align:left;font-weight:700;color:${T.muted}">Class</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700;color:${T.muted}">Department</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700;color:${T.muted}">Session</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700;color:${T.muted}">Students</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700;color:${T.muted}">Teachers</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700;color:${T.muted}">Capacity</th>
+        <th style="padding:10px 12px;text-align:left;font-weight:700;color:${T.muted}">Actions</th>
+      </tr></thead>
+      <tbody>${rows||`<tr><td colspan="7" style="text-align:center;padding:40px;color:${T.muted}">No classes found</td></tr>`}</tbody>
+    </table></div>
+  `)}`;
+}
+
+
 function renderAdminDash(){
   const tp=Object.values(attendance).filter(r=>r[today]==="present").length;
   const pc=students.filter(s=>s.feeStatus==="paid").length;
@@ -1807,6 +1870,121 @@ function renderModal(){
     <button onclick="${isEdit?`submitEditFeePlan('${sid}')`:`submitCreateFeePlan('${sid}')`}" style="width:100%;background:linear-gradient(135deg,${T.accent},${T.accentD});color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">${isEdit?"💾 Save Changes":"🚀 Create Plan & Generate Vouchers"}</button>`;
   }
 
+  if(modalState==="addClass"||modalState==="editClass"){
+    const isEdit=modalState==="editClass";
+    title=(isEdit?"✏️ Edit Class":"🏫 Add New Class");
+    content=`<div style="display:grid;gap:14px">
+      <div><label style="font-size:12px;font-weight:700;color:${T.muted};display:block;margin-bottom:6px">Class Name *</label>
+        <input id="f-clsname" value="${esc(formData.name||"")}" placeholder="e.g. CS-C, BBA-C" style="width:100%;padding:10px 14px;border:1.5px solid ${T.border};border-radius:10px;font-size:14px;box-sizing:border-box" oninput="formData.name=this.value"/></div>
+      <div><label style="font-size:12px;font-weight:700;color:${T.muted};display:block;margin-bottom:6px">Department *</label>
+        <input id="f-clsdept" value="${esc(formData.dept||"")}" placeholder="e.g. Computer Science" style="width:100%;padding:10px 14px;border:1.5px solid ${T.border};border-radius:10px;font-size:14px;box-sizing:border-box" oninput="formData.dept=this.value"/></div>
+      <div><label style="font-size:12px;font-weight:700;color:${T.muted};display:block;margin-bottom:6px">Session</label>
+        <input id="f-clssession" value="${esc(formData.session||"2025-26")}" placeholder="2025-26" style="width:100%;padding:10px 14px;border:1.5px solid ${T.border};border-radius:10px;font-size:14px;box-sizing:border-box" oninput="formData.session=this.value"/></div>
+      <div><label style="font-size:12px;font-weight:700;color:${T.muted};display:block;margin-bottom:6px">Capacity</label>
+        <input id="f-clscap" type="number" value="${esc(formData.capacity||40)}" min="1" style="width:100%;padding:10px 14px;border:1.5px solid ${T.border};border-radius:10px;font-size:14px;box-sizing:border-box" oninput="formData.capacity=Number(this.value)"/></div>
+      <div><label style="font-size:12px;font-weight:700;color:${T.muted};display:block;margin-bottom:6px">Description</label>
+        <input id="f-clsdesc" value="${esc(formData.description||"")}" placeholder="Optional description" style="width:100%;padding:10px 14px;border:1.5px solid ${T.border};border-radius:10px;font-size:14px;box-sizing:border-box" oninput="formData.description=this.value"/></div>
+      <button onclick="${isEdit?`submitEditClass('${formData._clsId}')`:"submitAddClass()"}" style="width:100%;background:linear-gradient(135deg,${T.accent},${T.accentD});color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px">${isEdit?"💾 Save Changes":"✅ Create Class"}</button>
+    </div>`;
+  }
+
+  if(modalState==="classDetail"){
+    const c=formData._cls;
+    if(!c){content=`<p>Class not found</p>`;title="Class Detail";}
+    else{
+      const stuList=students.filter(s=>s.cls===c.name);
+      const tchList=teachers.filter(t=>(t.assignedClasses||[]).includes(c.name));
+      const paidCount=stuList.filter(s=>s.feeStatus==="paid").length;
+      title=`🏫 ${c.name} — Overview`;
+      content=`<div style="display:grid;gap:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          ${statCard("Students",stuList.length,"🎓",T.blue)}
+          ${statCard("Teachers",tchList.length,"👨‍🏫",T.purple)}
+          ${statCard("Fee Paid",paidCount,"✅",T.green)}
+          ${statCard("Capacity",c.capacity,"📊",T.accent)}
+        </div>
+        <div style="background:${T.bg2};border-radius:12px;padding:14px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:${T.text2}">📋 Details</div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid ${T.border};font-size:13px"><span style="color:${T.muted}">Department</span><span style="font-weight:600">${esc(c.dept)}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid ${T.border};font-size:13px"><span style="color:${T.muted}">Session</span><span style="font-weight:600">${esc(c.session)}</span></div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:${T.muted}">Description</span><span style="font-weight:600">${esc(c.description||"—")}</span></div>
+        </div>
+        <div style="background:${T.bg2};border-radius:12px;padding:14px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:${T.text2}">🎓 Students (${stuList.length})</div>
+          ${stuList.length?stuList.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid ${T.border};font-size:13px"><span style="font-weight:600">${esc(s.name)}</span><span style="color:${T.muted}">${esc(s.rollNo)} · ${badge(s.feeStatus)}</span></div>`).join(""):`<div style="color:${T.muted};font-size:13px">No students enrolled.</div>`}
+        </div>
+        <div style="background:${T.bg2};border-radius:12px;padding:14px">
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:${T.text2}">👨‍🏫 Teachers (${tchList.length})</div>
+          ${tchList.length?tchList.map(t=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid ${T.border};font-size:13px"><span style="font-weight:600">${esc(t.name)}</span><span style="color:${T.muted}">${esc(t.subject)}</span></div>`).join(""):`<div style="color:${T.muted};font-size:13px">No teachers assigned.</div>`}
+        </div>
+        <button onclick="closeModal()" style="width:100%;background:${T.accentL};color:${T.accentD};border:none;border-radius:12px;padding:12px;font-size:14px;font-weight:700;cursor:pointer">Close</button>
+      </div>`;
+    }
+  }
+
+  if(modalState==="manageStudents"){
+    const c=formData._cls;
+    if(!c){content="<p>Not found</p>";title="Manage Students";}
+    else{
+      const enrolled=students.filter(s=>s.cls===c.name);
+      const unenrolled=students.filter(s=>s.cls!==c.name);
+      title=`🎓 Manage Students — ${c.name}`;
+      content=`<div style="display:grid;gap:16px">
+        <div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:${T.text2}">Add Student to ${c.name}</div>
+          <div style="display:flex;gap:8px">
+            <select id="ms-stu-sel" style="flex:1;padding:10px 12px;border:1.5px solid ${T.border};border-radius:10px;font-size:13px">
+              <option value="">— Select student —</option>
+              ${unenrolled.map(s=>`<option value="${s.id}">${esc(s.name)} (currently: ${esc(s.cls)})</option>`).join("")}
+            </select>
+            <button onclick="addStudentToClass('${c.id}')" style="background:${T.accent};color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+          </div>
+          <div style="font-size:11px;color:${T.muted};margin-top:5px">Note: Moving a student to this class changes their assigned class.</div>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:${T.text2}">Enrolled in ${c.name} (${enrolled.length})</div>
+          <div style="max-height:280px;overflow-y:auto">
+          ${enrolled.length?enrolled.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:${T.bg2};border-radius:10px;margin-bottom:6px;font-size:13px">
+            <div><span style="font-weight:700">${esc(s.name)}</span><span style="color:${T.muted};margin-left:8px">${esc(s.id)}</span></div>
+            <button onclick="removeStudentFromClass('${c.id}','${s.id}')" style="background:${T.redL};color:${T.red};border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer">Remove</button>
+          </div>`).join(""):`<div style="color:${T.muted};font-size:13px;padding:10px">No students enrolled.</div>`}
+          </div>
+        </div>
+      </div>`;
+    }
+  }
+
+  if(modalState==="manageTeachers"){
+    const c=formData._cls;
+    if(!c){content="<p>Not found</p>";title="Manage Teachers";}
+    else{
+      const assigned=teachers.filter(t=>(t.assignedClasses||[]).includes(c.name));
+      const unassigned=teachers.filter(t=>!(t.assignedClasses||[]).includes(c.name));
+      title=`👨‍🏫 Manage Teachers — ${c.name}`;
+      content=`<div style="display:grid;gap:16px">
+        <div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:${T.text2}">Assign Teacher to ${c.name}</div>
+          <div style="display:flex;gap:8px">
+            <select id="mt-tch-sel" style="flex:1;padding:10px 12px;border:1.5px solid ${T.border};border-radius:10px;font-size:13px">
+              <option value="">— Select teacher —</option>
+              ${unassigned.map(t=>`<option value="${t.id}">${esc(t.name)} — ${esc(t.subject)}</option>`).join("")}
+            </select>
+            <button onclick="addTeacherToClass('${c.id}')" style="background:${T.purple};color:#fff;border:none;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:13px">+ Assign</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:${T.text2}">Assigned to ${c.name} (${assigned.length})</div>
+          <div style="max-height:280px;overflow-y:auto">
+          ${assigned.length?assigned.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:${T.bg2};border-radius:10px;margin-bottom:6px;font-size:13px">
+            <div><span style="font-weight:700">${esc(t.name)}</span><span style="color:${T.muted};margin-left:8px">${esc(t.subject)}</span></div>
+            <button onclick="removeTeacherFromClass('${c.id}','${t.id}')" style="background:${T.redL};color:${T.red};border:none;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer">Remove</button>
+          </div>`).join(""):`<div style="color:${T.muted};font-size:13px;padding:10px">No teachers assigned.</div>`}
+          </div>
+        </div>
+      </div>`;
+    }
+  }
+
   if(modalState==="feeReport"){title="📊 Fee Report Summary";
     const paidC=students.filter(s=>s.feeStatus==="paid").length;
     const pendC=students.filter(s=>s.feeStatus==="pending").length;
@@ -1819,7 +1997,7 @@ function renderModal(){
     <button onclick="closeModal()" style="width:100%;background:linear-gradient(135deg,${T.accent},${T.accentD});color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer">Close</button>`;}
 
   return `<div onclick="closeModal()" style="position:fixed;inset:0;background:rgba(6,78,59,.45);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px">
-    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px;padding:30px;width:100%;max-width:${modalState==="addSubAdmin"||modalState==="editSubAdmin"?"580px":"520px"};max-height:90vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-shadow:0 24px 64px rgba(0,0,0,.25)">
+    <div onclick="event.stopPropagation()" style="background:#fff;border-radius:20px;padding:30px;width:100%;max-width:${(modalState==="addSubAdmin"||modalState==="editSubAdmin"||modalState==="classDetail"||modalState==="manageStudents"||modalState==="manageTeachers")?"580px":"520px"};max-height:90vh;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;box-shadow:0 24px 64px rgba(0,0,0,.25)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
         <span style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:18px;color:${T.text}">${title}</span>
         <button onclick="closeModal()" style="background:${T.bg};border:none;color:${T.muted};border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center">✕</button>
@@ -1882,7 +2060,90 @@ function renderModal(){
 // Password
 //   submitChangePassword
 // ================================================================
-function navTo(p){currentPage=p;searchQuery="";render();}
+function navTo(p){currentPage=p;searchQuery="";window._clsSearchQ="";render();}
+
+// ─── CLASS MANAGEMENT ACTIONS ───
+function openClassDetail(cid){const c=classesData.find(x=>x.id===cid);if(c){formData={_cls:c};modalState="classDetail";render();}}
+function openEditClass(cid){const c=classesData.find(x=>x.id===cid);if(c){formData={...c,_clsId:c.id};modalState="editClass";render();}}
+function openManageStudents(cid){const c=classesData.find(x=>x.id===cid);if(c){formData={_cls:c};modalState="manageStudents";render();}}
+function openManageTeachers(cid){const c=classesData.find(x=>x.id===cid);if(c){formData={_cls:c};modalState="manageTeachers";render();}}
+
+function submitAddClass(){
+  const name=(formData.name||"").trim();
+  const dept=(formData.dept||"").trim();
+  if(!name){alert("Class name is required.");return;}
+  if(!dept){alert("Department is required.");return;}
+  if(classesData.some(c=>c.name.toLowerCase()===name.toLowerCase())){alert("A class with this name already exists.");return;}
+  const newCls={id:"CLS-"+name.replace(/\s+/g,"-").toUpperCase()+"-"+Date.now(),name,dept,session:formData.session||"2025-26",capacity:formData.capacity||40,description:formData.description||""};
+  classesData.push(newCls);
+  if(!CLASSES.includes(name))CLASSES.push(name);
+  alert("✅ Class '"+name+"' created!");closeModal();
+}
+function submitEditClass(cid){
+  const c=classesData.find(x=>x.id===cid);if(!c)return;
+  const name=(formData.name||"").trim();
+  const dept=(formData.dept||"").trim();
+  if(!name){alert("Class name is required.");return;}
+  if(!dept){alert("Department is required.");return;}
+  const oldName=c.name;
+  const conflict=classesData.some(x=>x.id!==cid&&x.name.toLowerCase()===name.toLowerCase());
+  if(conflict){alert("Another class with this name already exists.");return;}
+  // Update student/teacher references if name changed
+  if(oldName!==name){
+    students.forEach(s=>{if(s.cls===oldName)s.cls=name;});
+    teachers.forEach(t=>{if(t.assignedClasses){const i=t.assignedClasses.indexOf(oldName);if(i>=0)t.assignedClasses[i]=name;}});
+    const ci=CLASSES.indexOf(oldName);if(ci>=0)CLASSES[ci]=name;else if(!CLASSES.includes(name))CLASSES.push(name);
+  }
+  c.name=name;c.dept=dept;c.session=formData.session||c.session;c.capacity=formData.capacity||c.capacity;c.description=formData.description||"";
+  alert("✅ Class updated!");closeModal();
+}
+function delClass(cid){
+  const c=classesData.find(x=>x.id===cid);if(!c)return;
+  const stuCount=students.filter(s=>s.cls===c.name).length;
+  const msg=stuCount>0?`This class has ${stuCount} enrolled student(s). Deleting will unassign them. Continue?`:`Delete class '${c.name}'?`;
+  if(!confirm(msg))return;
+  students.forEach(s=>{if(s.cls===c.name)s.cls="";});
+  teachers.forEach(t=>{if(t.assignedClasses)t.assignedClasses=t.assignedClasses.filter(n=>n!==c.name);});
+  classesData=classesData.filter(x=>x.id!==cid);
+  const ci=CLASSES.indexOf(c.name);if(ci>=0)CLASSES.splice(ci,1);
+  refreshContent();
+}
+function addStudentToClass(cid){
+  const c=classesData.find(x=>x.id===cid);if(!c)return;
+  const sel=document.getElementById("ms-stu-sel");
+  const sid=sel?.value;if(!sid){alert("Please select a student.");return;}
+  const s=students.find(x=>x.id===sid);if(!s)return;
+  s.cls=c.name;
+  formData._cls=c;// refresh class ref
+  render();
+}
+function removeStudentFromClass(cid,sid){
+  const c=classesData.find(x=>x.id===cid);if(!c)return;
+  const s=students.find(x=>x.id===sid);if(!s)return;
+  if(!confirm(`Remove ${s.name} from ${c.name}? Their class will be cleared.`))return;
+  s.cls="";
+  formData._cls=c;
+  render();
+}
+function addTeacherToClass(cid){
+  const c=classesData.find(x=>x.id===cid);if(!c)return;
+  const sel=document.getElementById("mt-tch-sel");
+  const tid=sel?.value;if(!tid){alert("Please select a teacher.");return;}
+  const t=teachers.find(x=>x.id===tid);if(!t)return;
+  if(!t.assignedClasses)t.assignedClasses=[];
+  if(!t.assignedClasses.includes(c.name))t.assignedClasses.push(c.name);
+  formData._cls=c;
+  render();
+}
+function removeTeacherFromClass(cid,tid){
+  const c=classesData.find(x=>x.id===cid);if(!c)return;
+  const t=teachers.find(x=>x.id===tid);if(!t)return;
+  if(!confirm(`Remove ${t.name} from ${c.name}?`))return;
+  if(t.assignedClasses)t.assignedClasses=t.assignedClasses.filter(n=>n!==c.name);
+  formData._cls=c;
+  render();
+}
+
 function toggleSidebar(){sidebarCollapsed=!sidebarCollapsed;render();}
 function doLogout(){currentUser=null;loginErr="";loginRole="admin";render();}
 function closeModal(){modalState=null;formData={};subAdminPermsSelected=[];render();}
@@ -1894,6 +2155,7 @@ function setForm(id,val){formData[id.replace("f-","")]=val;}
 
 function openModal(type){
   if(type==="addStudent")formData={name:"",cls:"CS-A",subjectGroup:"Computer Science",phone:"",guardianPhone:"",email:"",feeStatus:"pending",dob:"",password:"1234",_photoData:null};
+  else if(type==="addClass")formData={name:"",dept:"",session:"2025-26",capacity:40,description:""};
   else if(type==="addTeacher")formData={name:"",subject:SUBJECTS[0],dept:"Computer Science",phone:"",email:"",qualification:"",_photoData:null,assignedClasses:[]};
   else if(type==="addExam")formData={title:"",subject:SUBJECTS[0],cls:"CS-A",date:"",time:"09:00 AM",duration:"3 hours",room:"",totalMarks:"100"};
   else if(type==="addNotice")formData={title:"",type:"academic",author:"Principal"};
