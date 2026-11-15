@@ -2,134 +2,58 @@
 <!--
   ================================================================
   NEXus Solution — College Management System
-  index.html  |  Entry-point HTML shell
-  ================================================================
-
-  This file is intentionally minimal.
-  All styling  → styles.css
-  All logic     → app.js
-
-  How it works:
-  1.  On load, app.js calls render()
-  2.  render() injects either renderLogin() or renderShell()
-      into the #app <div> below
-  3.  Every user action triggers refreshContent() which
-      re-renders only the #main-content region (no full reload)
+  index.html  |  Entry-point — loads all JS modules in order
   ================================================================
 -->
 <html lang="en">
 
 <head>
-  <!-- ── Character encoding ── -->
   <meta charset="UTF-8" />
-
-  <!-- ── Responsive viewport ── -->
+  <!-- Responsive viewport.
+       maximum-scale / user-scalable were removed on purpose: blocking pinch
+       zoom fails WCAG 1.4.4 (spec §45). Horizontal scroll is prevented by
+       fixing the overflowing components instead — see ui.css section 6. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#064e3b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- ── Page title ── -->
   <title>NEXus Solution — College Management System</title>
 
-  <!-- ── Favicon (emoji fallback) ── -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
 
-  <!-- ── Google Fonts ──
-       Plus Jakarta Sans → body text, labels, inputs
-       Space Grotesk     → headings, numbers, KPI values
-  ── -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@700;800&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- ── Application stylesheet ── -->
-  <link rel="stylesheet" href="styles.css" />
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/static/css/styles.css" />
+  <!-- Institution context: department/campus screens + dark-mode corrections.
+       Must load AFTER styles.css so its dark-mode rules win the cascade. -->
+  <link rel="stylesheet" href="/static/css/context.css" />
+  <!-- Shared UI system: toasts, modals, loading states, dark-mode
+       corrections, responsive/overflow fixes. Loads LAST so it can correct
+       the older hard-coded rules above without editing every one of them. -->
+  <link rel="stylesheet" href="/static/css/ui.css" />
 
-  <!-- ── Inline base reset so the app fills the viewport before
-         styles.css is fully parsed ── -->
+  <!-- Inline critical styles (prevent FOUC) -->
   <style>
     html, body {
       height: 100%;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    /* Loading screen shown while app.js initialises */
-    #loading-screen {
-      position: fixed;
-      inset: 0;
       background: #064e3b;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      transition: opacity .4s ease;
+      overflow: hidden;
     }
-
-    #loading-screen.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .loading-logo {
-      font-size: 52px;
-      margin-bottom: 20px;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-
-    .loading-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 6px;
-    }
-
-    .loading-subtitle {
-      font-size: 13px;
-      color: rgba(255,255,255,.5);
-      margin-bottom: 32px;
-    }
-
-    /* Animated progress dots */
-    .loading-dots {
-      display: flex;
-      gap: 8px;
-    }
-
-    .loading-dot {
-      width: 8px;
-      height: 8px;
-      background: #059669;
-      border-radius: 50%;
-      animation: bounce 1.2s ease-in-out infinite;
-    }
-
-    .loading-dot:nth-child(2) { animation-delay: .2s; }
-    .loading-dot:nth-child(3) { animation-delay: .4s; }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1);    }
-      50%       { transform: scale(1.1); }
-    }
-
-    @keyframes bounce {
-      0%, 80%, 100% { transform: translateY(0);   }
-      40%           { transform: translateY(-8px); }
-    }
+    /* var(--bg) so the root canvas follows light/dark mode */
+    #app { width:100%; height:100vh; overflow:hidden; background:var(--bg); }
   </style>
 </head>
 
 <body>
 
-  <!-- ================================================================
-       LOADING SCREEN
-       Displayed briefly while JavaScript initialises the app.
-       Hidden automatically once render() completes.
-  ================================================================ -->
+  <!-- Loading Screen -->
   <div id="loading-screen" aria-hidden="true">
     <div class="loading-logo">🎓</div>
     <div class="loading-title">NEXus Solution</div>
@@ -141,66 +65,59 @@
     </div>
   </div>
 
+  <!-- App Root -->
+  <div id="app" role="main"></div>
 
-  <!-- ================================================================
-       APP ROOT
-       app.js dynamically injects all HTML into this single <div>.
+  <!-- ============================================================
+       JavaScript Modules — loaded in dependency order
 
-       Two possible states:
-         • Not logged in  → renderLogin()  paints the login page
-         • Logged in      → renderShell()  paints sidebar + content
+       Load order:
+         1. theme.js         — design tokens + UI helpers (T, esc, card…)
+         2. notifications.js — showToast() / notify.* (needs esc from theme)
+         3. data.js          — seed data + constants (students, teachers…)
+         4. state.js         — reactive state + render engine
+         5. context.js       — department/campus selection + context labels
+         6. charts.js        — responsive canvas charts
+         7. login.js         — login page + auth
+         8. shell.js         — app shell (sidebar, header, nav)
+         9. classes.js / academic_module.js — class & section management
+        10. admin.js         — all admin pages
+        11. teacher.js       — all teacher pages
+        12. student.js       — all student pages
+        13. modals.js        — all modal dialogs
+        14. downloads.js     — PDF/Excel/print helpers
+        15. api.js           — backend API bridge + DOMContentLoaded
+        16. modal.js         — LAST on purpose: showModal/confirmAction wrap
+                              the openModal/closeModal defined above, so the
+                              existing call sites gain focus management, ESC
+                              and a targeted repaint without being rewritten.
+  ============================================================ -->
+  <script src="/static/js/theme.js"></script>
+  <script src="/static/js/notifications.js"></script>
+  <script src="/static/js/data.js"></script>
+  <script src="/static/js/state.js"></script>
+  <script src="/static/js/context.js"></script>
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/login.js"></script>
+  <script src="/static/js/shell.js"></script>
+  <script src="/static/js/classes.js"></script>
+  <script src="/static/js/academic_module.js"></script>
+  <script src="/static/js/bs_academic.js"></script>
+  <script src="/static/js/admin.js"></script>
+  <script src="/static/js/teacher.js"></script>
+  <script src="/static/js/student.js"></script>
+  <script src="/static/js/modals.js"></script>
+  <script src="/static/js/downloads.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/modal.js"></script>
 
-       Sub-sections rendered inside #main-content:
-         Admin   → renderAdminPage()
-         Teacher → renderTeacherPage()
-         Student → renderStudentPage()
-  ================================================================ -->
-  <div id="app" role="main">
-    <!--
-      ┌──────────────────────────────────────┐
-      │  After login, the shell looks like:  │
-      │                                      │
-      │  ┌──────────┬───────────────────┐   │
-      │  │          │   Top Header Bar  │   │
-      │  │ Sidebar  ├───────────────────┤   │
-      │  │  Nav     │                   │   │
-      │  │          │  #main-content    │   │
-      │  │          │  (page content    │   │
-      │  │          │   renders here)   │   │
-      │  └──────────┴───────────────────┘   │
-      │                                      │
-      │  Modals overlay the whole shell.     │
-      └──────────────────────────────────────┘
-    -->
-  </div>
-
-
-  <!-- ================================================================
-       APPLICATION JAVASCRIPT
-       Loaded at the bottom so the DOM is ready.
-       Contains all data, state, render functions, and event handlers.
-  ================================================================ -->
-  <script src="app.js"></script>
-
-
-  <!-- ================================================================
-       LOADING SCREEN DISMISS
-       Once app.js has called render() the #app div will be populated.
-       We hide the loading screen after a short delay so it feels smooth.
-  ================================================================ -->
+  <!-- Dismiss loading screen after app initialises -->
   <script>
-    // Wait for the next frame after app.js has run, then fade out
     requestAnimationFrame(function() {
       setTimeout(function() {
-        var screen = document.getElementById('loading-screen');
-        if (screen) {
-          screen.classList.add('hidden');
-          // Remove from DOM after transition completes
-          setTimeout(function() {
-            if (screen.parentNode) screen.parentNode.removeChild(screen);
-          }, 450);
-        }
-      }, 300);
+        var s = document.getElementById('loading-screen');
+        if(s){ s.classList.add('hidden'); setTimeout(function(){ if(s.parentNode) s.parentNode.removeChild(s); }, 450); }
+      }, 350);
     });
   </script>
 
